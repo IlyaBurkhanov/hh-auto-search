@@ -1,45 +1,75 @@
-import importlib
-
-import db.models as models
 from db.core import Base, engine
 from sqlalchemy.orm import Session
+from hh_api.endpoints import MappingDict
 from typing import Optional
 
 
 class SaveManager:
-    models = {
-        getattr(models, model).__tablename__.lower(): getattr(models, model)
-        for model in models.__all__
-    }
 
     @staticmethod
     def truncate(*truncate_models):
-        tables = [model.__table__ for model in truncate_models]
+        tables = []
+        for model in truncate_models:
+            tables.append(model.__table__)
+            if model.relate:
+                tables.append(model.relate.model.__table__)
         Base.metadata.drop_all(engine, tables=tables)
         Base.metadata.create_all(engine, tables=tables)
 
-    def get_model(self, table_name: str) -> Optional[Base]:
-        table_name = table_name.lower()
-        return (self.models.get(table_name)
-                or self.models.get(table_name + 'db')
-                or self.models.get(table_name + '_db'))
-
-    def update_dict(self, table_name: str,
+    def update_dict(self, model: Base.__class__,
                     data: dict,
-                    mapping: dict = None,
+                    mapping: MappingDict = None,
                     full_update: bool = False) -> None:
-        model = self.get_model(table_name)
-        if model is None:
-            raise KeyError('NOT FOUND MODEL')
-
         if full_update:
             self.truncate(model)
 
-        if mapping:
-            # self.foo(data, mapping) и изменяем поля, пока заглушка
-            pass
-        with Session(bind=engine) as s:
-            s.bulk_insert_mappings(model, [{'key_attr': 'vacancy_label',
-                                            'id': 'with_address',
-                                            'name': 'Только с адресом'}])
-            s.commit()
+        with Session(bind=engine) as session:
+            if mapping is None:
+                session.bulk_insert_mappings(model, [dict(x) for x in data])
+            else:
+                if model.relate is None:
+                    raise ValueError('Mapping without related is '
+                                     f'impossible [{model.__tablename__}]')
+                self.save_with_mapping(session, model, data, mapping)
+            session.commit()
+
+    def update_recursive(self, model: Base.__class__,
+                         data: dict,
+                         recursion_value: str,
+                         full_update: bool = False,
+                         session=None):
+        def save(data_, session_):
+            for obj in data_:
+                dict_obj = dict(obj)
+                recursion = dict_obj.pop(recursion_value, [])
+                session.bulk_insert_mappings(model, [dict_obj])
+                if recursion:
+                    save(recursion, session_)
+
+        if full_update:
+            self.truncate(model)
+        with Session(bind=engine) as session:
+            save(data, session)
+            session.commit()
+
+
+
+    @staticmethod
+    def save_with_mapping(session, model, data, mapping):
+        related_model = model.relate.model
+        fk = model.relate.fk
+        for obj_ in data:
+            dict_obj = dict(obj_)
+            obj = related_model(
+                **{value: dict_obj.pop(key)
+                   for key, value in mapping.mapping.items()}
+            )
+            session.add(obj)
+            session.flush()
+            save_list = []
+            for val in dict_obj[mapping.value_key]:
+                dict_save = dict(val)
+                dict_save[fk] = obj.id
+                save_list.append(dict_save)
+            if save_list:
+                session.bulk_insert_mappings(model, save_list)

@@ -21,6 +21,7 @@ class ListDictionaries(BaseModel):
 class Currency(BaseModel):
     code: str
     abbr: str
+    name: str
     default: bool
     rate: float
     in_use: bool
@@ -28,3 +29,41 @@ class Currency(BaseModel):
 
 class ListCurrency(BaseModel):
     key: List[Currency]
+
+
+class Industry(BaseModel):
+    id: str
+    name: str
+
+
+class ListIndustry(BaseModel):
+    id: int
+    name: str
+    industries: List[Industry]
+
+
+class Languages(BaseModel):
+    id: str
+    name: str
+
+
+class WorkRole(BaseModel):
+    id: int
+    name: str
+    accept_incomplete_resumes: bool
+    is_default: bool
+
+
+class Business(BaseModel):
+    id: int
+    name: str
+    roles: List[WorkRole]
+
+
+class Areas(BaseModel):
+    id: int
+    parent_id: int = None
+    name: str
+    areas: List['Areas'] = None
+
+
