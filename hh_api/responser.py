@@ -4,7 +4,7 @@ import requests
 import unicodedata
 from pydantic import ValidationError
 
-from .endpoints import API
+from .endpoints import API, HEADER
 
 
 class Validator:
@@ -42,7 +42,7 @@ class Responser:
     bearer = None
     app_code = None
     #  Тут указать значение из ENV
-    header = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}
+    header = HEADER
     request = None
 
     def response(self, endpoint, params=None, headers=None):

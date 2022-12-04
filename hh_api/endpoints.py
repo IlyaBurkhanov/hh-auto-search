@@ -7,7 +7,7 @@ from db.core import Base as DB_Base
 import db.models as models
 
 API = 'https://api.hh.ru/'
-
+HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}
 
 def get_mapping_dict(*args):
     return {x: x for x in args}
@@ -77,4 +77,10 @@ class Settings:
         validator=validator.Areas,
         db_model=models.Areas,
         recursion_value='areas'
+    )
+    EMPLOYERS = SettingDict(
+        endpoint='employers',
+        response_data=ResponseData.LIST,
+        validator=validator.Employers,
+        db_model=models.Employers
     )

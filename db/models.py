@@ -1,4 +1,7 @@
-__all__ = ['Dictionaries', 'DictionariesKey', 'Currency']
+__all__ = [
+    'Dictionaries', 'DictionariesKey', 'Currency', 'Industry', 'Industries',
+    'Languages', 'Business', 'WorkRole', 'Areas', 'Employers'
+]
 
 from sqlalchemy.orm import relationship
 from dataclasses import dataclass, field
@@ -104,5 +107,13 @@ class Areas(Base):
     id = Column(Integer, primary_key=True)
     parent_id = Column(Integer, ForeignKey('areas.id'), nullable=True)
     name = Column(String(100))
+
+
+class Employers(Base):
+    __tablename__ = 'employers'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, default='')
+    open_vacancies = Column(Integer, default=0)
 
 

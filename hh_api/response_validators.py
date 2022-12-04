@@ -67,3 +67,9 @@ class Areas(BaseModel):
     areas: List['Areas'] = None
 
 
+class Employers(BaseModel):
+    id: int
+    name: str
+    open_vacancies: int
+
+
