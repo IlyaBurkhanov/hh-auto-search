@@ -2,6 +2,16 @@ import pytest
 from hh_api.endpoints import Settings
 from hh_api.responser import Responser, Validator
 from db.save_manager import SaveManager
+from workers.update_employers import WorkEmployers
+from db.models import Employers
+
+
+def test_employers():
+    SaveManager().truncate(Employers)
+    w = WorkEmployers()
+    w.update_employers(employer_type='private_recruiter',
+                       area=113)
+    assert len(w.set_id) > 250
 
 
 def test_response_dictionaries():

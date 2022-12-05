@@ -4,7 +4,7 @@ __all__ = [
 ]
 
 from sqlalchemy.orm import relationship
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from .core import Base
 
 from sqlalchemy import (

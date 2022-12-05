@@ -9,8 +9,6 @@ from workers.update_tasks import (
 
 Base.metadata.create_all(engine)
 
-
-
 start_once_a_day = [
     update_dictionaries,
     update_areas,

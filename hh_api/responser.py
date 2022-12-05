@@ -1,7 +1,7 @@
 import json
-
 import requests
 import unicodedata
+
 from pydantic import ValidationError
 
 from .endpoints import API, HEADER
