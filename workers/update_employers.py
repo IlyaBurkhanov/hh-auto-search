@@ -5,14 +5,13 @@ from random import random
 
 from hh_api.responser import Responser, Validator
 from hh_api.endpoints import Settings
-from db.save_manager import SaveManager, engine
+from db.save_manager import engine
 from db.models import Dictionaries
 
 EMPLOYER_TYPE_DICT = 'employer_type'
 
 
 class WorkEmployers:
-    save = SaveManager()
     validator = Validator()
     responser = Responser()
     settings = Settings.EMPLOYERS
@@ -148,3 +147,6 @@ class WorkEmployers:
             self.session.bulk_insert_mappings(
                 self.model, [dict(x) for x in save_result])
             self.session.commit()
+
+    def get_employer_by_id(self, id_company):
+        endpoint = self.settings.endpoint + f'/{id_company}'

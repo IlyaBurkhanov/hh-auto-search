@@ -1,6 +1,7 @@
 __all__ = [
     'Dictionaries', 'DictionariesKey', 'Currency', 'Industry', 'Industries',
-    'Languages', 'Business', 'WorkRole', 'Areas', 'Employers'
+    'Languages', 'Business', 'WorkRole', 'Areas', 'Employers',
+    'CompanyIndustryRelated',
 ]
 
 from sqlalchemy.orm import relationship
@@ -109,11 +110,29 @@ class Areas(Base):
     name = Column(String(100))
 
 
+class CompanyIndustryRelated(Base):
+    __tablename__ = 'company_industry'
+    __table_args__ = (PrimaryKeyConstraint('id_industry', 'id_employer'),)
+
+    id_industry = Column(String(30), ForeignKey('industries.id'),
+                         nullable=True)
+    id_employer = Column(Integer, ForeignKey('employers.id'),
+                         nullable=True)
+
+
 class Employers(Base):
     __tablename__ = 'employers'
 
     id = Column(Integer, primary_key=True)
     name = Column(Text, default='')
     open_vacancies = Column(Integer, default=0)
+    trusted = Column(Boolean, default=False)
+    type = Column(String(100))
+    description = Column(Text)
+    site_url = Column(String(500))
+    alternative_url = Column(String(500))
+    area_id = Column(Integer, ForeignKey('areas.id'), nullable=True)
 
-
+    area = relationship('Areas', backref='employers')
+    industries = relationship('Industries', secondary='company_industry',
+                              backref='employers')
