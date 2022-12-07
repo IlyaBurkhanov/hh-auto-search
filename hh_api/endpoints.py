@@ -84,3 +84,9 @@ class Settings:
         validator=validator.Employers,
         db_model=models.Employers
     )
+    EMPLOYER = SettingDict(
+        endpoint='employers',
+        response_data=ResponseData.DICT,
+        validator=validator.Employer,
+        db_model=models.Employers
+    )

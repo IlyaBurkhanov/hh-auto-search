@@ -52,8 +52,6 @@ class SaveManager:
             save(data, session)
             session.commit()
 
-
-
     @staticmethod
     def save_with_mapping(session, model, data, mapping):
         related_model = model.relate.model

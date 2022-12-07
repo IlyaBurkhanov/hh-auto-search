@@ -6,6 +6,7 @@ from db.models import *
 from workers.update_tasks import (
     update_dictionaries, update_areas, update_other
 )
+from workers.employers import WorkEmployers
 
 Base.metadata.create_all(engine)
 
@@ -24,4 +25,6 @@ def start_tasks(tasks: list):
 
 
 if __name__ == '__main__':
-    start_tasks(start_once_a_day)
+    # start_tasks(start_once_a_day)
+    WorkEmployers().get_employer_by_id(1740)
+

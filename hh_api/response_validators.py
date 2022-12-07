@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, AnyUrl, Field
 from typing import List
 
 
@@ -72,4 +72,19 @@ class Employers(BaseModel):
     name: str
     open_vacancies: int
 
+
+class Employer(Employers):
+    description: str
+    type: str
+    trusted: bool = False
+    site_url: AnyUrl = None
+    alternate_url: AnyUrl = None
+    area: Areas = None
+    industries: List[Industry] = Field(default_factory=list)
+
+    class Config:
+        fields = {
+            'area': {'exclude': True},
+            'industries': {'exclude': True}
+        }
 

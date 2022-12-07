@@ -130,7 +130,7 @@ class Employers(Base):
     type = Column(String(100))
     description = Column(Text)
     site_url = Column(String(500))
-    alternative_url = Column(String(500))
+    alternate_url = Column(String(500))
     area_id = Column(Integer, ForeignKey('areas.id'), nullable=True)
 
     area = relationship('Areas', backref='employers')
