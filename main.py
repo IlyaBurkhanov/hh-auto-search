@@ -1,6 +1,10 @@
 from functools import partial
 from tqdm import tqdm
 
+from rating.set_rating_config import (
+    set_areas_rating_from_csv, set_industries_rating_from_csv,
+    set_industry_rating_from_csv
+)
 from db.core import Base, engine
 from db.models import *
 from workers.update_tasks import (
@@ -26,5 +30,8 @@ def start_tasks(tasks: list):
 
 if __name__ == '__main__':
     # start_tasks(start_once_a_day)
-    WorkEmployers().get_employer_by_id(1740)
+    # WorkEmployers().get_employer_by_id(1740)
+    set_areas_rating_from_csv()
+    set_industries_rating_from_csv()
+    set_industry_rating_from_csv()
 

@@ -1,7 +1,7 @@
 __all__ = [
     'Dictionaries', 'DictionariesKey', 'Currency', 'Industry', 'Industries',
-    'Languages', 'Business', 'WorkRole', 'Areas', 'Employers',
-    'CompanyIndustryRelated',
+    'Languages', 'Business', 'WorkRole', 'Areas', 'Employers', 'AreasRating',
+    'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating'
 ]
 
 from sqlalchemy.orm import relationship
@@ -136,3 +136,27 @@ class Employers(Base):
     area = relationship('Areas', backref='employers')
     industries = relationship('Industries', secondary='company_industry',
                               backref='employers')
+
+
+class AreasRating(Base):
+    __tablename__ = 'areas_rating'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    my_rating = Column(Integer, default=5)
+
+
+class IndustryRating(Base):
+    __tablename__ = 'industry_rating'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(500))
+    my_rating = Column(Integer, default=50)
+
+
+class IndustriesRating(Base):
+    __tablename__ = 'industries_rating'
+
+    id = Column(String(10), primary_key=True)
+    name = Column(String(2000))
+    my_rating = Column(Integer, default=50)
