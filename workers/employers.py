@@ -1,6 +1,6 @@
 import unicodedata
 
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 from time import sleep
@@ -162,9 +162,9 @@ class WorkEmployers:
 
     def __check_employer(self, raw_employer: dict):
         employer_valid = self.employer_validator.parse_obj(raw_employer)
-        text_employer = bs(employer_valid.description, 'lxml')
+        text_employer = BeautifulSoup(employer_valid.description, 'lxml')
         employer_valid.description = unicodedata.normalize(
-            'NFKD', text_employer.text.lower().strip())
+            'NFKD', text_employer.text.strip())
         return employer_valid
 
     def get_employer_by_id(self, id_company):
