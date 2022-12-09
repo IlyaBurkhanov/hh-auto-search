@@ -11,13 +11,13 @@ with open('config_for_rating/employer_rating_config.json',
     RATING_CONFIG = json.load(file)
 
 
-def rating(profile, work_with, benefits, areas):
+def final_rating(profile, work_with, benefits, areas):
     if profile + work_with == 0:
         return 0
     return (1 + .2 * profile) * (work_with * 3 + benefits * 2 + areas + 10)
 
 
-MAX_RATING = rating(10, 10, 10, 10)
+MAX_RATING = final_rating(10, 10, 10, 10)
 
 
 def get_morph_set(text: str) -> set:
@@ -76,4 +76,4 @@ def get_employ_rating(text):
                    'work_with': rating_work_with,
                    'benefits': rating_benefits,
                    'areas': rating_areas}
-    return int(get_rating(**result_dict)/MAX_RATING), result_dict
+    return int(final_rating(**result_dict)/MAX_RATING), result_dict
