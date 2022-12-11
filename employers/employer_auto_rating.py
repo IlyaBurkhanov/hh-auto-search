@@ -3,7 +3,7 @@ import pymorphy3
 import re
 
 from typing import Union
-
+# в 3.11 ошибка. Исправление -> github.com/kmike/pymorphy2/pull/157
 MORPH = pymorphy3.MorphAnalyzer()
 
 with open('config_for_rating/employer_rating_config.json',

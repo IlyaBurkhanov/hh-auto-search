@@ -60,7 +60,7 @@ class CalcEmployerRating:
         text_rating, result_dict = get_employ_rating(employer.description)
         area_rating = self.get_area_rating(employer.area)
         industry_rating = self.get_industry_rating(employer.industries)
-        rating =  final_rating(text_rating, area_rating, industry_rating)
+        rating = final_rating(text_rating, area_rating, industry_rating)
         rating *= 1 if employer.trusted else UN_TRUST_COFF
         result_dict['auto_rating'] = rating
         return result_dict

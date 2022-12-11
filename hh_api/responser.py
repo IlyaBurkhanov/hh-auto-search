@@ -55,6 +55,6 @@ class Responser:
     def get_json(self):
         if self.request is None:
             raise ValueError('Request has not been sent')
-        text = unicodedata.normalize('NFKD', self.request.text)
+        text = unicodedata.normalize('NFKD', self.request.text or '')
         return json.loads(text)
 
