@@ -49,16 +49,17 @@ if __name__ == '__main__':
     #                                    area=1, employer_type='company',
     #                                    text='банк')
     employer = Employer()
-    with Session(engine) as session:
-        q = [x for x, in session.query(model.Employers.id).filter(
-            model.Employers.auto_rating).all()]
-    errs = []
-    print(q)
-    for x in q:
-        try:
-            employer.get_employer_by_id(x, update=True)
-        except Exception as e:
-            print(e.args[0], x)
-            errs.append(x)
-        time.sleep(0.3)
-    print(errs)
+    employer.update_empty_employers()
+    # with Session(engine) as session:
+    #     q = [x for x, in session.query(model.Employers.id).filter(
+    #         model.Employers.auto_rating).all()]
+    # errs = []
+    # print(q)
+    # for x in q:
+    #     try:
+    #         employer.get_employer_by_id(x, update=True)
+    #     except Exception as e:
+    #         print(e.args[0], x)
+    #         errs.append(x)
+    #     time.sleep(0.3)
+    # print(errs)

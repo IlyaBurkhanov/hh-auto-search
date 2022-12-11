@@ -2,6 +2,7 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import ProgrammingError
 from tqdm import tqdm
 from time import sleep
 from random import random
@@ -18,7 +19,10 @@ class AddSession:
         self.session = Session(engine)
 
     def __del__(self):
-        self.session.close()
+        try:
+            self.session.close()
+        except ProgrammingError:
+            pass
 
 
 EmployerRating = CalcEmployerRating()
@@ -205,3 +209,21 @@ class Employer(AddSession):
         if employer_in_db:
             self.drop_employer(id_company)
         self._save_employer(employer_valid)
+
+    def update_empty_employers(self):
+        id_list = [idx for idx, in self.session.query(MODEL.id).filter(
+            MODEL.auto_rating.is_(None))]
+        for idx in id_list:
+            self.get_employer_by_id(idx, update=True)
+
+    def employer_update_inplace(self, id_company):
+        employer = self.session.query(MODEL).filter(
+            MODEL.id == id_company)
+        rating = EmployerRating.get_employer_rating(employer.first())
+        employer.update(rating)
+        self.session.commit()
+
+    def bulk_employer_update_inplace(self):
+        id_list = [idx for idx, in self.session.query(MODEL.id).all()]
+        for idx in tqdm(id_list):
+            self.employer_update_inplace(idx)
