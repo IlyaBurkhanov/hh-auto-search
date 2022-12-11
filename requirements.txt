@@ -1,0 +1,25 @@
+attrs==22.1.0
+beautifulsoup4==4.11.1
+certifi==2022.9.24
+charset-normalizer==2.1.1
+colorama==0.4.6
+DAWG-Python==0.7.2
+docopt==0.6.2
+greenlet==2.0.1
+idna==3.4
+iniconfig==1.1.1
+lxml @ file:///lxml-4.9.0-cp311-cp311-win_amd64.whl
+lz4 @ file:///lz4-4.0.1-cp311-cp311-win_amd64.whl
+packaging==21.3
+pluggy==1.0.0
+pydantic==1.10.2
+pymorphy3==1.1.1
+pymorphy3-dicts-ru==2.4.417150.4580142
+pyparsing==3.0.9
+pytest==7.2.0
+requests==2.28.1
+soupsieve==2.3.2.post1
+SQLAlchemy==1.4.44
+tqdm==4.64.1
+typing_extensions==4.4.0
+urllib3==1.26.13
