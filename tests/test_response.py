@@ -2,7 +2,7 @@ import pytest
 from hh_api.endpoints import Settings
 from hh_api.responser import Responser, Validator
 from db.save_manager import SaveManager
-from workers.employers import WorkEmployers
+from employers.main import WorkEmployers
 from db.models import Employers
 
 

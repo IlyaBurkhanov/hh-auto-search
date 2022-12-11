@@ -1,20 +1,22 @@
 import json
-import pymorphy2
+import pymorphy3
 import re
 
 from typing import Union
 
-MORPH = pymorphy2.MorphAnalyzer()
+MORPH = pymorphy3.MorphAnalyzer()
 
 with open('config_for_rating/employer_rating_config.json',
           'r', encoding='utf8') as file:
     RATING_CONFIG = json.load(file)
 
 
-def final_rating(profile, work_with, benefits, areas):
-    if profile + work_with == 0:
+def final_rating(rating_profile, rating_work_with, rating_benefits,
+                 rating_areas):
+    if rating_profile + rating_work_with == 0:
         return 0
-    return (1 + .2 * profile) * (work_with * 3 + benefits * 2 + areas + 10)
+    return (1 + .2 * rating_profile) * (
+            rating_work_with * 3 + rating_benefits * 2 + rating_areas + 10)
 
 
 MAX_RATING = final_rating(10, 10, 10, 10)
@@ -72,8 +74,8 @@ def get_employ_rating(text):
     rating_work_with = get_rating(morph_set, RATING_CONFIG['work_with'])
     rating_benefits = get_rating(morph_set, RATING_CONFIG['benefits'])
     rating_areas = get_rating(morph_set, RATING_CONFIG['areas'])
-    result_dict = {'profile': rating_profile,
-                   'work_with': rating_work_with,
-                   'benefits': rating_benefits,
-                   'areas': rating_areas}
-    return int(final_rating(**result_dict)/MAX_RATING), result_dict
+    result_dict = {'rating_profile': rating_profile,
+                   'rating_work_with': rating_work_with,
+                   'rating_benefits': rating_benefits,
+                   'rating_areas': rating_areas}
+    return int(100 * final_rating(**result_dict)/MAX_RATING), result_dict

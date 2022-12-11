@@ -74,17 +74,25 @@ class Employers(BaseModel):
 
 
 class Employer(Employers):
-    description: str
-    type: str
+    description: str = None
+    type: str = None
     trusted: bool = False
-    site_url: AnyUrl = None
-    alternate_url: AnyUrl = None
+    site_url: str = None
+    alternate_url: str = None
     area: Areas = None
     industries: List[Industry] = Field(default_factory=list)
+    rating_profile: int = None
+    rating_work_with: int = None
+    rating_benefits: int = None
+    rating_areas: int = None
+    manual_rating: int = None
+    auto_rating: int = None
+
+    def dict(self, *args, **kwargs):
+        result = super().dict(*args, **kwargs)
+        for val in self.__class__.Config.exclude:
+            result.pop(val, None)
+        return result
 
     class Config:
-        fields = {
-            'area': {'exclude': True},
-            'industries': {'exclude': True}
-        }
-
+        exclude = {'area', 'industries'}

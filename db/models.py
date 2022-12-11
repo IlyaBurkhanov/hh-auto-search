@@ -132,6 +132,12 @@ class Employers(Base):
     site_url = Column(String(500))
     alternate_url = Column(String(500))
     area_id = Column(Integer, ForeignKey('areas.id'), nullable=True)
+    rating_profile = Column(Integer)
+    rating_work_with = Column(Integer)
+    rating_benefits = Column(Integer)
+    rating_areas = Column(Integer)
+    auto_rating = Column(Integer)
+    manual_rating = Column(Integer)
 
     area = relationship('Areas', backref='employers')
     industries = relationship('Industries', secondary='company_industry',
@@ -160,3 +166,4 @@ class IndustriesRating(Base):
     id = Column(String(10), primary_key=True)
     name = Column(String(2000))
     my_rating = Column(Integer, default=50)
+

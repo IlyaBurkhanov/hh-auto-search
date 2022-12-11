@@ -2,7 +2,7 @@ import pytest
 import sqlalchemy
 
 import db.save_manager as save_manager
-import workers.employers as ue
+import employers.main as ue
 
 result = sqlalchemy.create_engine('sqlite:///test.db', echo=False,
                                   future=True)
