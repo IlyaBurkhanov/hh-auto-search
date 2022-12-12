@@ -5,7 +5,7 @@ from tqdm import tqdm
 from employers.main import Employer, UpdateEmployers
 from rating.set_rating_config import (
     set_areas_rating_from_csv, set_industries_rating_from_csv,
-    set_industry_rating_from_csv
+    set_industry_rating_from_csv, set_business_role_rating
 )
 from sqlalchemy.orm import Session
 
@@ -26,21 +26,21 @@ set_dictionaries = [
 ]
 
 set_config = [
-    partial(set_areas_rating_from_csv),
-    partial(set_industries_rating_from_csv),
-    partial(set_industry_rating_from_csv),
+    set_areas_rating_from_csv,
+    set_industries_rating_from_csv,
+    set_industry_rating_from_csv,
+    set_business_role_rating,
 ]
 
 
-def start_tasks(tasks: list):
-    for task in tqdm(tasks, desc='update dictionaries'):
+def start_tasks(tasks: list, desc=''):
+    for task in tqdm(tasks, desc=desc):
         task()
 
 
 if __name__ == '__main__':
-    from time import sleep
-
-    # start_tasks(start_once_a_month)
+    # start_tasks(set_dictionaries, desc='set_dictionaries')
+    start_tasks(set_config, desc='set_config')
     # Employer().get_employer_by_id(1740, update=True)
     # set_areas_rating_from_csv()
     # set_industries_rating_from_csv()
@@ -48,8 +48,8 @@ if __name__ == '__main__':
     # UpdateEmployers().update_employers(page_per_list=100, with_vacancies=True,
     #                                    area=1, employer_type='company',
     #                                    text='банк')
-    employer = Employer()
-    employer.update_empty_employers()
+    # employer = Employer()
+    # employer.update_empty_employers()
     # with Session(engine) as session:
     #     q = [x for x, in session.query(model.Employers.id).filter(
     #         model.Employers.auto_rating).all()]

@@ -6,8 +6,9 @@ import hh_api.response_validators as validator
 from db.core import Base as DB_Base
 import db.models as models
 
-API = 'https://api.hh.ru/'
-HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}
+API = 'https://api.hh.ru/'  # ENV
+HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV
+
 
 def get_mapping_dict(*args):
     return {x: x for x in args}

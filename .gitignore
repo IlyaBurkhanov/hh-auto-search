@@ -6,7 +6,7 @@ __pycache__/
 dumps_db/
 # C extensions
 *.so
-develop_story.md
+/develop_story.md
 # Distribution / packaging
 .Python
 build/
@@ -28,6 +28,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 config_for_rating/
+algo.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -129,3 +130,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/algo.py

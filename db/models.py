@@ -1,7 +1,8 @@
 __all__ = [
     'Dictionaries', 'DictionariesKey', 'Currency', 'Industry', 'Industries',
     'Languages', 'Business', 'WorkRole', 'Areas', 'Employers', 'AreasRating',
-    'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating'
+    'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating',
+    'BusinessRating', 'RoleRating'
 ]
 
 from sqlalchemy.orm import relationship
@@ -167,3 +168,21 @@ class IndustriesRating(Base):
     name = Column(String(2000))
     my_rating = Column(Integer, default=50)
 
+
+class BusinessRating(Base):
+    __tablename__ = 'business_rating'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(500))
+    my_rating = Column(Integer, default=2)
+
+
+class RoleRating(Base):
+    __tablename__ = 'role_rating'
+    __table_args__ = (PrimaryKeyConstraint('business_id', 'id'),)
+
+    business_id = Column(Integer, ForeignKey('business_rating.id'),
+                         nullable=True)
+    id = Column(Integer)
+    name = Column(String(500))
+    my_rating = Column(Integer, default=2)
