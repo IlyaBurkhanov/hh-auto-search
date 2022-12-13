@@ -2,9 +2,11 @@ from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel as PydanticModel
 
+
+import db.models as models
 import hh_api.response_validators as validator
 from db.core import Base as DB_Base
-import db.models as models
+
 
 API = 'https://api.hh.ru/'  # ENV
 HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV

@@ -57,4 +57,3 @@ class Responser:
             raise ValueError('Request has not been sent')
         text = unicodedata.normalize('NFKD', self.request.text or '')
         return json.loads(text)
-

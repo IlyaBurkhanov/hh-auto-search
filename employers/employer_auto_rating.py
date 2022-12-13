@@ -1,14 +1,7 @@
-import json
-import pymorphy3
 import re
-
 from typing import Union
-# в 3.11 ошибка. Исправление -> github.com/kmike/pymorphy2/pull/157
-MORPH = pymorphy3.MorphAnalyzer()
 
-with open('config_for_rating/employer_rating_config.json',
-          'r', encoding='utf8') as file:
-    RATING_CONFIG = json.load(file)
+from configs.conf import MORPH, RATING_CONFIG
 
 
 def final_rating(rating_profile, rating_work_with, rating_benefits,
@@ -78,4 +71,4 @@ def get_employ_rating(text):
                    'rating_work_with': rating_work_with,
                    'rating_benefits': rating_benefits,
                    'rating_areas': rating_areas}
-    return int(100 * final_rating(**result_dict)/MAX_RATING), result_dict
+    return int(100 * final_rating(**result_dict) / MAX_RATING), result_dict

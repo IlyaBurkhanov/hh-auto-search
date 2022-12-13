@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from db.core import engine, Base
 from db.models import (AreasRating, IndustryRating, IndustriesRating,
-    BusinessRating, RoleRating)
+                       BusinessRating, RoleRating)
 
 
 def read_end_parse(what_parse: str, column_name_pos: Mapping[str, int],
@@ -106,4 +106,3 @@ def set_role_rating_from_csv():
 def set_business_role_rating():
     set_business_rating_from_csv()
     set_role_rating_from_csv()
-

@@ -1,7 +1,6 @@
 from db.core import Base, engine
 from sqlalchemy.orm import Session
 from hh_api.endpoints import MappingDict
-from typing import Optional
 
 
 class SaveManager:

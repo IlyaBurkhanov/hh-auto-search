@@ -11,7 +11,7 @@ from .core import Base
 
 from sqlalchemy import (
     Column, Integer, String, Text, ForeignKey, PrimaryKeyConstraint, Boolean,
-    Float
+    Float, Numeric
 )
 
 Base.__table_args__ = {'sqlite_autoincrement': True}

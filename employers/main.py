@@ -7,7 +7,7 @@ from tqdm import tqdm
 from time import sleep
 from random import random
 
-from hh_api.responser import Responser, Validator
+from configs.conf import FULL_EMPLOYERS_ID, RESPONSER, VALIDATOR
 from hh_api.endpoints import Settings
 from db.save_manager import engine
 from db.models import CompanyIndustryRelated
@@ -27,11 +27,7 @@ class AddSession:
 
 EmployerRating = CalcEmployerRating()
 ENDPOINT = Settings.EMPLOYERS.endpoint
-RESPONSER = Responser()
-VALIDATOR = Validator()
 MODEL = Settings.EMPLOYERS.db_model
-# Наш мемкэш для работодателей.
-FULL_EMPLOYERS_ID = set(idx for idx, in AddSession().session.query(MODEL.id))
 
 
 def return_employer_with_rating(employer):
