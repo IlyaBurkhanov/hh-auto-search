@@ -96,3 +96,15 @@ class Employer(Employers):
 
     class Config:
         exclude = {'area', 'industries'}
+
+
+class Specializations(BaseModel):
+    id: str
+    name: str
+    laboring: bool = False
+
+
+class Specialization(BaseModel):
+    id: int
+    name: str
+    specializations: List[Specializations] = None

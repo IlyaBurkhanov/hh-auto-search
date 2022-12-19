@@ -5,7 +5,8 @@ from tqdm import tqdm
 from employers.main import Employer, UpdateEmployers
 from rating.set_rating_config import (
     set_areas_rating_from_csv, set_industries_rating_from_csv,
-    set_industry_rating_from_csv, set_business_role_rating
+    set_industry_rating_from_csv, set_business_role_rating,
+    set_specializations_rating
 )
 from sqlalchemy.orm import Session
 
@@ -23,6 +24,7 @@ set_dictionaries = [
     partial(update_other, response_type='INDUSTRY'),
     partial(update_other, response_type='LANGUAGES'),
     partial(update_other, response_type='BUSINESS_ROLE', del_key='categories'),
+    partial(update_other, response_type='SPECIALIZATIONS'),
 ]
 
 set_config = [
@@ -30,6 +32,7 @@ set_config = [
     set_industries_rating_from_csv,
     set_industry_rating_from_csv,
     set_business_role_rating,
+    set_specializations_rating,
 ]
 
 
@@ -39,6 +42,7 @@ def start_tasks(tasks: list, desc=''):
 
 
 if __name__ == '__main__':
+    update_dictionaries()
     # start_tasks(set_dictionaries, desc='set_dictionaries')
     start_tasks(set_config, desc='set_config')
     # Employer().get_employer_by_id(1740, update=True)

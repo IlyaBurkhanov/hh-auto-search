@@ -2,14 +2,9 @@ from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel as PydanticModel
 
-
 import db.models as models
 import hh_api.response_validators as validator
 from db.core import Base as DB_Base
-
-
-API = 'https://api.hh.ru/'  # ENV
-HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV
 
 
 def get_mapping_dict(*args):
@@ -93,3 +88,12 @@ class Settings:
         validator=validator.Employer,
         db_model=models.Employers
     )
+    SPECIALIZATIONS = SettingDict(
+        endpoint='specializations',
+        response_data=ResponseData.LIST,
+        db_model=models.SpecializationsDetails,
+        validator=validator.Specialization,
+        mapping=MappingDict(mapping=get_mapping_dict('id', 'name'),
+                            value_key='specializations')
+    )
+

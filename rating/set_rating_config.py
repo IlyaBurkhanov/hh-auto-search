@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from db.core import engine, Base
 from db.models import (AreasRating, IndustryRating, IndustriesRating,
-                       BusinessRating, RoleRating)
+                       BusinessRating, RoleRating, SpecializationRating,
+                       SpecializationsRating)
 
 
 def read_end_parse(what_parse: str, column_name_pos: Mapping[str, int],
@@ -103,6 +104,39 @@ def set_role_rating_from_csv():
     save_worker(model, what, column_name_pos, type_dict)
 
 
+def set_specialization_rating_from_csv():
+    """
+    Обновляем рейтинг специализации.
+    Поля csv id/name/rating.
+    Рейтинг в промежутке от 0 до 100 включительно.
+    """
+    model = SpecializationRating
+    what = 'specialization'
+    column_name_pos = {'id': 0, 'name': 1, 'my_rating': 2}
+    type_dict = {'id': int, 'my_rating': int}
+    save_worker(model, what, column_name_pos, type_dict)
+
+
+def set_specializations_rating_from_csv():
+    """
+    Обновляем рейтинги специализаций.
+    Поля csv specialization_id/id/name/rating.
+    Рейтинг в промежутке от 0 до 100 включительно.
+    """
+    model = SpecializationsRating
+    what = 'specializations'
+    column_name_pos = {'specialization_id': 0, 'id': 1,
+                       'name': 2, 'my_rating': 3}
+    type_dict = {'specialization_id': int,
+                 'my_rating': int}
+    save_worker(model, what, column_name_pos, type_dict)
+
+
 def set_business_role_rating():
     set_business_rating_from_csv()
     set_role_rating_from_csv()
+
+
+def set_specializations_rating():
+    set_specialization_rating_from_csv()
+    set_specializations_rating_from_csv()

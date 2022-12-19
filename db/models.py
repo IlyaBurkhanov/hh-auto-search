@@ -2,7 +2,8 @@ __all__ = [
     'Dictionaries', 'DictionariesKey', 'Currency', 'Industry', 'Industries',
     'Languages', 'Business', 'WorkRole', 'Areas', 'Employers', 'AreasRating',
     'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating',
-    'BusinessRating', 'RoleRating'
+    'BusinessRating', 'RoleRating', 'Specialization', 'SpecializationsDetails',
+    'SpecializationRating', 'SpecializationsRating'
 ]
 
 from sqlalchemy.orm import relationship
@@ -11,7 +12,7 @@ from .core import Base
 
 from sqlalchemy import (
     Column, Integer, String, Text, ForeignKey, PrimaryKeyConstraint, Boolean,
-    Float, Numeric
+    Float
 )
 
 Base.__table_args__ = {'sqlite_autoincrement': True}
@@ -103,6 +104,26 @@ class WorkRole(Base):
     is_default = Column(Boolean)
 
 
+class Specialization(Base):
+    __tablename__ = 'specialization'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(500), nullable=False)
+    specializations = relationship('SpecializationsDetails',
+                                   backref='specialization')
+
+
+class SpecializationsDetails(Base):
+    __tablename__ = 'specializations_details'
+    __table_args__ = (PrimaryKeyConstraint('specialization_key', 'id'),)
+    relate = RelatedMapping(model=Specialization, fk='specialization_key')
+
+    specialization_key = Column(Integer, ForeignKey('specialization.id'))
+    id = Column(String(30), nullable=False)
+    name = Column(String(500), nullable=False)
+    laboring = Column(Boolean, default=False)
+
+
 class Areas(Base):
     __tablename__ = 'areas'
 
@@ -186,3 +207,22 @@ class RoleRating(Base):
     id = Column(Integer)
     name = Column(String(500))
     my_rating = Column(Integer, default=2)
+
+
+class SpecializationRating(Base):
+    __tablename__ = 'specialization_rating'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(500))
+    my_rating = Column(Integer, default=50)
+
+
+class SpecializationsRating(Base):
+    __tablename__ = 'specializations_rating'
+    __table_args__ = (PrimaryKeyConstraint('specialization_id', 'id'),)
+
+    specialization_id = Column(Integer, ForeignKey('specialization_rating.id'),
+                               nullable=True)
+    id = Column(String(30), nullable=False)
+    name = Column(String(500))
+    my_rating = Column(Integer, default=50)

@@ -4,7 +4,8 @@ import unicodedata
 
 from pydantic import ValidationError
 
-from .endpoints import API, HEADER
+API = 'https://api.hh.ru/'
+HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV
 
 
 class Validator:
