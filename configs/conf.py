@@ -16,7 +16,7 @@ HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV
 
 RATING_FILE = 'config_for_rating/employer_rating_config.json'  # ENV
 SEARCH_FILE = 'config_for_rating/search_config.json'  # ENV
-UN_USE_CLUSTER_ID = ['salary', 'area']
+UN_USE_CLUSTER_ID = ['salary', 'area', 'label', 'education']
 MAX_VACANCIES_BY_REQUEST = 1000  # ENV
 VACANCY_ENDPOINT = 'vacancies'  # ENV
 
@@ -26,10 +26,11 @@ def read_json(json_path):
         return json.load(file)
 
 
-def get_from_db(model, what: str = 'index'):
+def get_from_db(model, what: str = 'employer'):
     with Session(engine) as session:
-        if what == 'index':
-            result = set(idx for idx, in session.query(model.id))
+        if what == 'employer':
+            result = {idx: rating for idx, rating in
+                      session.query(model.id, model.auto_rating)}
         elif what == 'rating':
             result = {idx: rating for idx, rating in
                       session.query(model.id, model.my_rating)}
@@ -39,8 +40,9 @@ def get_from_db(model, what: str = 'index'):
     return result
 
 
-FULL_EMPLOYERS_ID = get_from_db(Employers, what='index')
-CURRENCY = get_from_db(Currency, what='currency')
+FULL_EMPLOYERS = get_from_db(Employers, what='employer')  # Работодатели
+ALL_VACANCIES = set()  # Вакансии в БД (ID)
+CURRENCY = get_from_db(Currency, what='currency')  # Курсы валют
 AREAS_RATING = get_from_db(AreasRating, what='rating')
 BUSINESS_RATING = get_from_db(BusinessRating, what='rating')
 INDUSTRIES_RATING = get_from_db(IndustriesRating, what='rating')

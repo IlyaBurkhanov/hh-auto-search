@@ -6,7 +6,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, validator, Field
 from typing import List, Union
 
-from configs.conf import MORPH, DROP_PARAMS
+from configs.conf import MORPH, DROP_PARAMS, MAX_VACANCIES_BY_REQUEST
 
 # Извлекаемые поля из объектов связанных с моделью
 OBJECT_FIELD = {
@@ -60,9 +60,7 @@ class Params(BaseModelWithDict):
         format_date = '%Y-%m-%d'
         if isinstance(value, (date, datetime)):
             return value.strftime(format_date)
-        elif isinstance(value, str):
-            datetime.strptime(value, format_date)
-            return value
+        datetime.strptime(value, format_date)  # Проверка или возврат ошибки
         return value
 
     @validator('period')
@@ -118,7 +116,7 @@ class ResponseVacancy(BaseModel):
         result = set()
         for text in ['requirement', 'responsibility']:
             for words in BeautifulSoup(
-                    v.get(text, ''), 'lxml').find_all('highlighttext'):
+                    v.get(text) or '', 'lxml').find_all('highlighttext'):
                 for word in words.text.lower().split():
                     result.add(MORPH.normal_forms(word)[0])
         return ' '.join(result)
@@ -146,7 +144,7 @@ class ResponseVacancy(BaseModel):
 class ClustersParams(BaseModelWithDict):
     # Модель используется только при нарезке запросов, большом числе найденных
     # вакансий
-    clusters: bool = False
+    clusters: bool = None
     date_from: str = None
     date_to: str = None
     per_page: int = 100
@@ -173,8 +171,8 @@ class ClusterItem(BaseModel):
         if not v:
             return None
         request_params = dict(parse_qsl(urlparse(v).query, separator='&'))
-        if values['count'] <= 1000:
-            request_params['clusters'] = False
+        if values['count'] <= MAX_VACANCIES_BY_REQUEST:
+            request_params['clusters'] = None
         return request_params
 
 
