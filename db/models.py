@@ -3,8 +3,11 @@ __all__ = [
     'Languages', 'Business', 'WorkRole', 'Areas', 'Employers', 'AreasRating',
     'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating',
     'BusinessRating', 'RoleRating', 'Specialization', 'SpecializationsDetails',
-    'SpecializationRating', 'SpecializationsRating'
+    'SpecializationRating', 'SpecializationsRating', 'Skills', 'VacancySkills',
+    'Salary', 'VacancyProfRole', 'VacancySpecializations', 'Vacancy'
 ]
+
+from datetime import datetime
 
 from sqlalchemy.orm import relationship
 from dataclasses import dataclass
@@ -17,6 +20,10 @@ from sqlalchemy import (
 
 Base.__table_args__ = {'sqlite_autoincrement': True}
 Base.relate = None
+
+
+def get_time():
+    return datetime.now().strftime('%Y%m%d')
 
 
 @dataclass
@@ -226,3 +233,102 @@ class SpecializationsRating(Base):
     id = Column(String(30), nullable=False)
     name = Column(String(500))
     my_rating = Column(Integer, default=50)
+
+
+class Skills(Base):
+    __tablename__ = 'skills'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(300), nullable=False)
+    rating = Column(Integer, default=None)
+    vacancy = relationship('Vacancy', secondary='vacancy_skills',
+                           back_populates='key_skills')
+
+
+class VacancySkills(Base):
+    __tablename__ = 'vacancy_skills'
+    __table_args__ = (PrimaryKeyConstraint('skill_id', 'vacancy_id'),)
+
+    skill_id = Column(Integer, ForeignKey('skills.id'))
+    vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
+
+
+class Salary(Base):
+    __tablename__ = 'vacancy_salary'
+
+    id = Column(Integer, ForeignKey('vacancy.id'), primary_key=True)
+    from_ = Column(Float)
+    to = Column(Float)
+    gross = Column(Boolean)
+    currency = Column(String(30))
+
+
+class VacancyProfRole(Base):
+    __tablename__ = 'vacancy_prof_role'
+    __table_args__ = (PrimaryKeyConstraint('vacancy_id', 'id'),)
+
+    vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
+    id = Column(Integer)
+
+
+class VacancySpecializations(Base):
+    __tablename__ = 'vacancy_specialization'
+    __table_args__ = (PrimaryKeyConstraint('vacancy_id', 'id', 'profarea_id'),)
+
+    vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
+    id = Column(String(20))
+    profarea_id = Column(Integer)
+
+
+class Vacancy(Base):
+    __tablename__ = 'vacancy'
+
+    id = Column(Integer, primary_key=True)
+    date_save = Column(Integer, default=get_time)
+    name = Column(String(500))
+    premium = Column(Boolean)
+    department = Column(String(500))
+    has_test = Column(Boolean)
+    response_letter_required = Column(Boolean)
+    area = Column(Integer)  # Пока без FK, рейтинги кладем в кэш
+    salary = relationship('Salary', uselist=False, backref='vacancy')
+    type_ = Column(String(100))
+    response_url = Column(String(500))
+    published_at = Column(String(30))
+    created_at = Column(String(30))
+    archived = Column(Boolean)
+    employer = Column(Integer)  # Пока без FK, рейтинги кладем в кэш
+    snippet = Column(String(1000))
+    schedule = Column(String(100))
+    counters = Column(Integer)
+    description = Column(Text)
+    branded_description = Column(Text)
+    key_skills = relationship('Skills', secondary='vacancy_skills',
+                              back_populates='vacancy')
+    experience = Column(String(50))
+    employment = Column(String(50))
+    billing_type = Column(String(50))
+    allow_messages = Column(Boolean)
+    accept_incomplete_resumes = Column(Boolean)
+    professional_roles = relationship('VacancyProfRole',
+                                      uselist=True, backref='vacancy')
+    specializations = relationship('VacancySpecializations', uselist=True,
+                                   backref='vacancy')
+    hidden = Column(Boolean)
+    quick_responses_allowed = Column(Boolean)
+    test = Column(Boolean)
+
+    def __init__(self, **kwargs):
+        salary = kwargs.pop('salary', None)
+        professional_roles = kwargs.pop('professional_roles', None)
+        specializations = kwargs.pop('specializations', None)
+        super().__init__(**kwargs)
+
+        if salary:
+            self.salary = Salary(**salary)
+        if professional_roles:
+            self.professional_roles = [
+                VacancyProfRole(**item) for item in professional_roles]
+        if specializations:
+            self.specializations = [
+                VacancySpecializations(**item) for item in specializations]

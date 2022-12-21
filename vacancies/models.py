@@ -4,7 +4,7 @@ from urllib.parse import parse_qsl, urlparse
 from bs4 import BeautifulSoup
 from datetime import date, datetime
 from pydantic import BaseModel, validator, Field
-from typing import List, Union
+from typing import List, Union, Optional
 
 from configs.conf import MORPH, DROP_PARAMS, MAX_VACANCIES_BY_REQUEST
 
@@ -12,10 +12,14 @@ from configs.conf import MORPH, DROP_PARAMS, MAX_VACANCIES_BY_REQUEST
 OBJECT_FIELD = {
     'department': 'name',  # Имя департамента
     'area': 'id',  # id местоположения
-    'type_': 'name',  # тип вакансии
+    'type_': 'id',  # тип вакансии
     'employer': 'id',  # ИД работодателя
     'schedule': 'id',  # График работы
     'counters': 'responses',  # Количество откликов на вакансию
+    'experience': 'id',  # Требуемый опыт работы
+    'employment': 'id',  # Тип занятости
+    'billing_type': 'id',  # Тип вакансии для работодателя (платная или нет)
+    'test': 'required',  # Оклик без прохождения теста?
 }
 
 
@@ -52,7 +56,7 @@ class Params(BaseModelWithDict):
     clusters: bool = True  # Выдает кластеры в поисковой выдаче.
     per_page: int = Field(le=100, ge=1, default=100)  # Число вакансий на лист
     responses_count_enabled: bool = True  # Количеством откликов на вакансию
-    professional_role: List[int] = None  # id проф ролей
+    professional_role: Union[int, List[int]] = None  # id проф ролей
     page: int = 0  # Страница в пагинации
 
     @validator('date_from', 'date_to', pre=True)
@@ -60,7 +64,6 @@ class Params(BaseModelWithDict):
         format_date = '%Y-%m-%d'
         if isinstance(value, (date, datetime)):
             return value.strftime(format_date)
-        datetime.strptime(value, format_date)  # Проверка или возврат ошибки
         return value
 
     @validator('period')
@@ -79,6 +82,28 @@ class Salary(BaseModel):
     currency: str = None
 
 
+class KeySkill(BaseModel):
+    name: str
+
+
+class ProfRole(BaseModel):
+    id: int
+
+
+class Specializations(BaseModel):
+    id: str = None
+    profarea_id: int = None
+
+
+class Languages(BaseModel):
+    id: str
+    level: str = None
+
+    @validator('id', pre=True)
+    def check_level(cls, v):
+        return v['id'] if v else None
+
+
 class ResponseVacancy(BaseModel):
     id: int
     premium: bool = False  # Премиальная?
@@ -94,11 +119,23 @@ class ResponseVacancy(BaseModel):
     published_at: str = None  # Дата публикации
     created_at: str = None  # Дата создания вакансии
     archived: bool = False  # В Архиве?
-    employer: int  # ID Работодателя
+    employer: int = None  # ID Работодателя
     snippet: str = ''  # Ключевые найденные слова в str, через пробел
     schedule: str = None  # График работы
     counters: int = None
-    description: str = None  # Обновить потом!
+    description: str = None  # Описание
+    branded_description: str = None  # Красивое описание
+    key_skills: List[KeySkill] = None
+    experience: str = None
+    employment: str = None  # Тип занятости
+    billing_type: str = None  # Тип вакансии для работодателя (платная, нет)
+    allow_messages: bool = None  # Писать после приглашения, отзыва
+    accept_incomplete_resumes: bool = None  # отзыв неполным резюме?
+    professional_roles: List[ProfRole] = None  # Проф роли
+    specializations: List[Specializations] = None  # Специализации
+    hidden: bool = False  # Скрытая?
+    quick_responses_allowed: bool = False  # Быстрый отклик?
+    test: bool = None  # Надо проходить тест?
 
     @validator('published_at', 'created_at', pre=True)
     def check_date(cls, v):
@@ -107,12 +144,14 @@ class ResponseVacancy(BaseModel):
         return str(v)[:10]
 
     @validator('snippet', pre=True)
-    def check_snippet(cls, v):
+    def check_snippet(cls, v: Union[str, dict]):
         """
         :return: Ключевые слова требуемых навыков в нормальной форме
         """
         if v is None:
             return ''
+        if isinstance(v, str):
+            return v
         result = set()
         for text in ['requirement', 'responsibility']:
             for words in BeautifulSoup(
@@ -120,6 +159,12 @@ class ResponseVacancy(BaseModel):
                 for word in words.text.lower().split():
                     result.add(MORPH.normal_forms(word)[0])
         return ' '.join(result)
+
+    @validator('description', 'branded_description', pre=True)
+    def check_description(cls, v):
+        if v is None:
+            return ''
+        return BeautifulSoup(v or '', 'lxml').text
 
     @validator(*OBJECT_FIELD, pre=True)
     def check_department(cls, v, config, field):
@@ -132,6 +177,14 @@ class ResponseVacancy(BaseModel):
         if v is None:
             return v
         return config.return_value_from_object(v, field.name)
+
+    def dict(self, *args, **kwargs):
+        result = super().dict(*args, **kwargs)
+        keys = list(result.keys())
+        for key in keys:
+            if result[key] is None:
+                result.pop(key, None)
+        return result
 
     class Config:
 

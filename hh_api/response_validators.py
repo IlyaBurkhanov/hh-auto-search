@@ -68,9 +68,9 @@ class Areas(BaseModel):
 
 
 class Employers(BaseModel):
-    id: int
-    name: str
-    open_vacancies: int
+    id: int = None
+    name: str = None
+    open_vacancies: int = None
 
 
 class Employer(Employers):

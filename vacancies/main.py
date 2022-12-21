@@ -1,17 +1,18 @@
+from time import sleep
 from typing import List, Optional
 
 from math import ceil
 import requests
 from datetime import datetime, date, timedelta
 
-# from employers.main import Employer
+from employers.main import Employer
 from vacancies.models import (
     ResponseVacancy, FindVacancies, Params, ClusterItem, Clusters
 )
 from configs.conf import (
     CONFIG_SEARCH, VACANCY_ENDPOINT, API, HEADER, FULL_EMPLOYERS,
-    MAX_VACANCIES_BY_REQUEST, UN_USE_CLUSTER_ID, DROP_PARAMS,
-    SPECIALIZATION_RATING, INDUSTRY_RATING, ROLE_RATING
+    MAX_VACANCIES_BY_REQUEST, UN_USE_CLUSTER_ID,
+    SPECIALIZATION_RATING, INDUSTRY_RATING, ROLE_RATING, ALL_VACANCIES
 )
 
 ClusterRatings = {
@@ -19,6 +20,7 @@ ClusterRatings = {
     'industry': (INDUSTRY_RATING, 'industry'),
     'professional_role': (ROLE_RATING, 'professional_role'),
 }
+EMPLOYER_WORKER = Employer()
 
 
 def request_vacancies(endpoint,
@@ -45,6 +47,7 @@ def cluster_analysis(items: List[ClusterItem],
     biggest_cnt = 0
     for item in items:
         if rating_dict.get(getattr(item.params, field_name, -1), 1) == 0:
+            print(f'del {item.count}, {item.name}')
             continue
         if biggest_cnt < item.count:
             biggest_cnt = item.count
@@ -53,15 +56,20 @@ def cluster_analysis(items: List[ClusterItem],
 
 
 def check_and_save_vacancy(vacancies: List[ResponseVacancy]):
-    # Проверка вакансий, если были пропускает, запрашивает работодателя если
-    # нет в справочнике, записывает его
-    # Расчет рейтинга
-    pass
+    for vacancy in vacancies:
+        if (vacancy.employer is not None and
+                vacancy.employer not in FULL_EMPLOYERS):
+            EMPLOYER_WORKER.get_employer_by_id(vacancy.employer)
+        if vacancy.id not in ALL_VACANCIES and not vacancy.archived:
+            # Cчитаем рейтинг вакансии
+            # Сохраняем вакансию
+            ALL_VACANCIES.add(vacancy.id)
+            # print(vacancy.id, vacancy.name)
 
 
 class JobSearch:
     """Для каждого запроса создаем отдельный экземпляр данного класса"""
-    ENDPOINT = API + '/' + VACANCY_ENDPOINT
+    ENDPOINT = API + VACANCY_ENDPOINT
 
     def __init__(self):
         self.params: Optional[Params] = None
@@ -100,10 +108,14 @@ class JobSearch:
 
     def search_vacancies_by_date(self, date_from: datetime = None,
                                  date_to: datetime = None, **params):
+        if not params:
+            params = CONFIG_SEARCH
+        params['clusters'] = True
         if date_from is None:
             # Запрос последней даты запроса из БД. Если ее нет, возврат ошибки
             # Если есть, запрос от нее до текущей даты - 1 день.
-            pass
+            date_from = datetime(year=2022, month=12, day=19)  # Костыль
+            date_to = datetime(year=2022, month=12, day=19)  # Костыль
         for delta in range((date_to - date_from).days + 1):
             date_found = (date_from + timedelta(days=delta)
                           ).strftime('%Y-%m-%d')
@@ -131,6 +143,8 @@ class JobSearch:
 
     def pars_worker(self, response: FindVacancies):
         self.params.clusters = None
+        # print(f'FIND: {response.found} vacancy:')
+        # print(self.params.dict())
         use_page = ceil(response.found / response.per_page)
         max_page = min(use_page, MAX_VACANCIES_BY_REQUEST / response.per_page)
         check_and_save_vacancy(response.items)
@@ -138,12 +152,13 @@ class JobSearch:
             self.params.page = page
             vacancies = self.return_vacancies()
             check_and_save_vacancy(vacancies.items)
+            sleep(1)
 
     def return_vacancies(self, **params):
         """Передаем параметры запроса, возвращаем валидный результат."""
         if params:
             self.params = Params(**params)  # Валидация параметров запроса
-        response = request_vacancies(endpoint=self.ENDPOINT, headers=HEADER,
+        response = request_vacancies(endpoint=self.ENDPOINT,
                                      params=self.params.dict())
         return FindVacancies(**response)
 

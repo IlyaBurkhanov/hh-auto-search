@@ -42,9 +42,10 @@ def start_tasks(tasks: list, desc=''):
 
 
 if __name__ == '__main__':
-    update_dictionaries()
+    pass
+    # update_dictionaries()
     # start_tasks(set_dictionaries, desc='set_dictionaries')
-    start_tasks(set_config, desc='set_config')
+    # start_tasks(set_config, desc='set_config')
     # Employer().get_employer_by_id(1740, update=True)
     # set_areas_rating_from_csv()
     # set_industries_rating_from_csv()

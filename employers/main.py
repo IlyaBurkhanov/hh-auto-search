@@ -7,7 +7,7 @@ from tqdm import tqdm
 from time import sleep
 from random import random
 
-from configs.conf import FULL_EMPLOYERS_ID, RESPONSER, VALIDATOR
+from configs.conf import FULL_EMPLOYERS, RESPONSER, VALIDATOR
 from hh_api.endpoints import Settings
 from db.save_manager import engine
 from db.models import CompanyIndustryRelated
@@ -39,8 +39,6 @@ def response_employers(params: dict, endpoint: str = None) -> dict:
     """Наш опросник hh.api на работодателей"""
     endpoint = endpoint or ENDPOINT
     response = RESPONSER.response(endpoint, params=params)
-    if response.request.status_code != 200:
-        raise ValueError('Ошибка запроса!!!!')
     return response.get_json()
 
 
@@ -56,7 +54,7 @@ class UpdateEmployers(AddSession):
         employers_count = self.get_employers_count()
         # В ЛОГИ
         print('Доля заполнения базы работодателями составляет: '
-              f'{len(FULL_EMPLOYERS_ID) / employers_count:.1%}')
+              f'{len(FULL_EMPLOYERS) / employers_count:.1%}')
 
     @staticmethod
     def get_employers_count() -> int:
@@ -111,7 +109,7 @@ class UpdateEmployers(AddSession):
 
         for _ in tqdm(range(1, max_request),
                       disable='Обновление справочника Работодателей'):
-            sleep(random() * 2)  # Шоб не забаняли
+            sleep(random())  # Шоб не забаняли
             try:
                 params['page'] += 1
                 self._save_result(
@@ -134,7 +132,7 @@ class UpdateEmployers(AddSession):
         for employer in check_employer:
             if self._check_open_vacancy(employer):
                 continue
-            FULL_EMPLOYERS_ID.add(employer.id)
+            FULL_EMPLOYERS[employer.id] = None
             save_result.append(employer)
 
         if save_result:
@@ -145,7 +143,9 @@ class UpdateEmployers(AddSession):
     def _check_open_vacancy(self, employer):
         """Чекаем вакансии работодателя. Если работодатель есть, обновляем
         открытые вакансии."""
-        if employer.id in FULL_EMPLOYERS_ID:
+        if employer.id is None:  # Имеются анонимные работодатели
+            return True
+        if employer.id in FULL_EMPLOYERS:
             employ = self.session.query(MODEL).filter(
                 MODEL.id == employer.id).first()
             employ.open_vacancies = employer.open_vacancies
@@ -173,7 +173,7 @@ class Employer(AddSession):
                 id_employer=employer.id)
             )
         self.session.commit()
-        FULL_EMPLOYERS_ID.add(employer.id)
+        FULL_EMPLOYERS[employer.id] = employer.auto_rating
 
     def _check_employer(self, raw_employer: dict):
         employer_valid = self.validator.parse_obj(raw_employer)
@@ -185,12 +185,11 @@ class Employer(AddSession):
     def drop_employer(self, id_company):
         self.session.query(MODEL).filter(MODEL.id == id_company).delete()
         self.session.query(CompanyIndustryRelated).filter(
-            CompanyIndustryRelated.id_employer == id_company
-        ).delete()
+            CompanyIndustryRelated.id_employer == id_company).delete()
         self.session.commit()
 
     def get_employer_by_id(self, id_company, update=False):
-        employer_in_db = int(id_company) in FULL_EMPLOYERS_ID
+        employer_in_db = int(id_company) in FULL_EMPLOYERS
         if employer_in_db and not update:
             print(f'Работодатель с ID [{id_company}] уже в базе')  # В ЛОГ
             return
@@ -213,10 +212,10 @@ class Employer(AddSession):
             self.get_employer_by_id(idx, update=True)
 
     def employer_update_inplace(self, id_company):
-        employer = self.session.query(MODEL).filter(
-            MODEL.id == id_company)
+        employer = self.session.query(MODEL).filter(MODEL.id == id_company)
         rating = EmployerRating.get_employer_rating(employer.first())
         employer.update(rating)
+        FULL_EMPLOYERS[id_company] = employer.auto_rating
         self.session.commit()
 
     def bulk_employer_update_inplace(self):
