@@ -22,12 +22,13 @@ def get_morph_set(text: str) -> set:
     }
 
 
-def calc_rating(morph_set: set, list_find: list):
+def calc_rating(morph_set: set, signal_words: list):
     def finder_str_one(word):
         result = word in morph_set
-        words_list = word.split('-')
-        if not result and len(words_list) > 1:
-            return all(word in morph_set for word in words)
+        if not result:
+            words_list = word.split('-')
+            if len(words_list) > 1:
+                return all(word in morph_set for word in words_list)
         return result
 
     def finder(word_rating: list | str):
@@ -35,31 +36,28 @@ def calc_rating(morph_set: set, list_find: list):
             return finder_str_one(word_rating)
 
         result = finder_str_one(word_rating[0])
-
         if not result:
             return False
 
         if isinstance(word_rating[1], str):
-            return all(finder_str_one(word_rating[i])
-                       for i in range(1, len(word_rating)))
+            return all(finder_str_one(word_rating[i]) for i in range(1, len(word_rating)))
+        return any(finder_str_one(word) for word in word_rating[1])
 
-        return finder(words[1])
-
-    for words in list_find:
+    for words in signal_words:
         if finder(words):
             return True
     return False
 
 
-def get_rating(morph_set, rating_list):
+def get_rating(morph_set: set, rating_list: list):
     rating_list.sort(key=lambda x: x[0], reverse=True)
-    for rating, list_find in rating_list:
-        if calc_rating(morph_set, list_find):
+    for rating, signal_words in rating_list:
+        if calc_rating(morph_set, signal_words):
             return rating
     return 0
 
 
-def get_employ_rating(text):
+def get_employ_rating(text: str):
     morph_set = get_morph_set(text)
     rating_profile = get_rating(morph_set, RATING_CONFIG['profile'])
     rating_work_with = get_rating(morph_set, RATING_CONFIG['work_with'])
