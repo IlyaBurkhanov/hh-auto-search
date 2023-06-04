@@ -1,12 +1,13 @@
+from datetime import date, datetime
 from enum import Enum
 from urllib.parse import parse_qsl, urlparse
 
 from bs4 import BeautifulSoup
-from datetime import date, datetime
 from pydantic import BaseModel, validator, Field
-from typing import List, Union, Optional
 
-from configs.conf import MORPH, DROP_PARAMS, MAX_VACANCIES_BY_REQUEST
+from configs.config import settings
+from configs.dictionaries import DROP_PARAMS
+from configs.workers import MORPH
 
 # Извлекаемые поля из объектов связанных с моделью
 OBJECT_FIELD = {
@@ -43,9 +44,9 @@ class BaseModelWithDict(BaseModel):
 
 class Params(BaseModelWithDict):
     text: str = ''  # hh.ru/article/1175 - параметры запросов
-    area: List[int] = None  # id локаций для поиска из справочника
-    industry: List[Union[int, str]] = None  # id индустрии или ее подвида
-    employer_id: List[int] = None  # id работодателей
+    area: list[int] = None  # id локаций для поиска из справочника
+    industry: list[int | str] = None  # id индустрии или ее подвида
+    employer_id: list[int] = None  # id работодателей
     currency: str = 'RUR'  # Код валюты из справочника. Использовать с salary
     salary: int = 100_000  # ЗП с этой вилкой или без указания ЗП. DEFAULT: RUR
     only_with_salary: bool = False  # Только с указанием ЗП
@@ -56,7 +57,7 @@ class Params(BaseModelWithDict):
     clusters: bool = True  # Выдает кластеры в поисковой выдаче.
     per_page: int = Field(le=100, ge=1, default=100)  # Число вакансий на лист
     responses_count_enabled: bool = True  # Количеством откликов на вакансию
-    professional_role: Union[int, List[int]] = None  # id проф ролей
+    professional_role: int | list[int] = None  # id проф ролей
     page: int = 0  # Страница в пагинации
 
     @validator('date_from', 'date_to', pre=True)
@@ -76,8 +77,8 @@ class Params(BaseModelWithDict):
 
 
 class Salary(BaseModel):
-    from_: Union[int, float] = Field(default=None, alias='from')
-    to: Union[int, float] = None
+    from_: int | float = Field(default=None, alias='from')
+    to: int | float = None
     gross: bool = True
     currency: str = None
 
@@ -125,14 +126,14 @@ class ResponseVacancy(BaseModel):
     counters: int = None
     description: str = None  # Описание
     branded_description: str = None  # Красивое описание
-    key_skills: List[KeySkill] = None
+    key_skills: list[KeySkill] = None
     experience: str = None
     employment: str = None  # Тип занятости
     billing_type: str = None  # Тип вакансии для работодателя (платная, нет)
     allow_messages: bool = None  # Писать после приглашения, отзыва
     accept_incomplete_resumes: bool = None  # отзыв неполным резюме?
-    professional_roles: List[ProfRole] = None  # Проф роли
-    specializations: List[Specializations] = None  # Специализации
+    professional_roles: list[ProfRole] = None  # Проф роли
+    specializations: list[Specializations] = None  # Специализации
     hidden: bool = False  # Скрытая?
     quick_responses_allowed: bool = False  # Быстрый отклик?
     test: bool = None  # Надо проходить тест?
@@ -144,7 +145,7 @@ class ResponseVacancy(BaseModel):
         return str(v)[:10]
 
     @validator('snippet', pre=True)
-    def check_snippet(cls, v: Union[str, dict]):
+    def check_snippet(cls, v: str | dict):
         """
         :return: Ключевые слова требуемых навыков в нормальной форме
         """
@@ -187,7 +188,6 @@ class ResponseVacancy(BaseModel):
         return result
 
     class Config:
-
         @classmethod
         def return_value_from_object(cls, value_dict, field_name):
             field = OBJECT_FIELD[field_name]
@@ -203,7 +203,7 @@ class ClustersParams(BaseModelWithDict):
     per_page: int = 100
     salary: int = None
     text: str = None
-    area: Union[int, List[int]] = None
+    area: int | list[int] = None
     only_with_salary: bool = None
     specialization: int = None
     industry: int = None
@@ -224,7 +224,7 @@ class ClusterItem(BaseModel):
         if not v:
             return None
         request_params = dict(parse_qsl(urlparse(v).query, separator='&'))
-        if values['count'] <= MAX_VACANCIES_BY_REQUEST:
+        if values['count'] <= settings.MAX_VACANCIES_BY_REQUEST:
             request_params['clusters'] = None
         return request_params
 
@@ -232,13 +232,13 @@ class ClusterItem(BaseModel):
 class Clusters(BaseModel):
     name: str
     id: str
-    items: List[ClusterItem] = None
+    items: list[ClusterItem] = None
 
 
 class FindVacancies(BaseModel):
-    items: List[ResponseVacancy]
+    items: list[ResponseVacancy]
     found: int
     pages: int
     per_page: int
     page: int
-    clusters: List[Clusters] = None
+    clusters: list[Clusters] = None

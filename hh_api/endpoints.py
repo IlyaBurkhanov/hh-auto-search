@@ -4,7 +4,7 @@ from pydantic import BaseModel as PydanticModel
 
 import db.models as models
 import hh_api.response_validators as validator
-from db.core import Base as DB_Base
+from configs.config import Base as DB_Base
 
 
 def get_mapping_dict(*args):

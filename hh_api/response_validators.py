@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator, AnyUrl, Field
+from pydantic import BaseModel, validator, Field
 from typing import List
 
 

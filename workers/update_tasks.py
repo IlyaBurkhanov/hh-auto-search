@@ -1,4 +1,4 @@
-from configs.conf import SAVE_MANAGER, VALIDATOR, RESPONSER
+from configs.workers import SAVE_MANAGER, VALIDATOR, RESPONSER
 from hh_api.endpoints import Settings
 
 
@@ -8,8 +8,7 @@ def update_other(response_type, parse_as_dict=False, del_key=None):
     data = response.get_json()
     if del_key:
         data = data.pop(del_key)
-    check = VALIDATOR.return_objects(
-        settings.validator, data, parse_as_dict=parse_as_dict)
+    check = VALIDATOR.return_objects(settings.validator, data, parse_as_dict=parse_as_dict)
     SAVE_MANAGER.update_dict(model=settings.db_model,
                              data=check,
                              mapping=settings.mapping,
@@ -38,8 +37,7 @@ def update_areas():
     settings = Settings.AREAS
     response = RESPONSER.response(settings.endpoint)
     data = response.get_json()
-    check = VALIDATOR.return_objects(
-        settings.validator, data)
+    check = VALIDATOR.return_objects(settings.validator, data)
     SAVE_MANAGER.update_recursive(model=settings.db_model,
                                   data=check,
                                   recursion_value=settings.recursion_value,

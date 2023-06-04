@@ -3,9 +3,10 @@ import requests
 import unicodedata
 
 from pydantic import ValidationError
+from configs.config import settings
 
-API = 'https://api.hh.ru/'
-HEADER = {'User-Agent': 'Ilya_APP/0.1 (iaburhanov@mail.ru)'}  # ENV
+API = settings.API
+HEADER = settings.HEADER  # ENV
 
 
 class Validator:
@@ -42,7 +43,6 @@ class Responser:
     client_code = None
     bearer = None
     app_code = None
-    #  Тут указать значение из ENV
     header = HEADER
     request = None
 

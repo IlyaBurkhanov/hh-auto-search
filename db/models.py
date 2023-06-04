@@ -11,7 +11,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import relationship
 from dataclasses import dataclass
-from .core import Base
+from configs.config import Base
 
 from sqlalchemy import (
     Column, Integer, String, Text, ForeignKey, PrimaryKeyConstraint, Boolean,

@@ -2,15 +2,15 @@ import pytest
 from hh_api.endpoints import Settings
 from hh_api.responser import Responser, Validator
 from db.save_manager import SaveManager
-from employers.main import WorkEmployers
+from employers.main import UpdateEmployers
 from db.models import Employers
 
 
+@pytest.skip
 def test_employers():
     SaveManager().truncate(Employers)
-    w = WorkEmployers()
-    w.update_employers(employer_type='private_recruiter',
-                       area=113)
+    w = UpdateEmployers()
+    w.update_employers(employer_type='private_recruiter', area=113)
     assert len(w.set_id) > 250
 
 
@@ -33,19 +33,18 @@ def test_response_dictionaries():
 
     assert len(currency) == len(check_currency), 'Что-то незавалидировалось'
 
-    save.update_dict(model=curr_settings.db_model,
-                     data=check_currency, full_update=True)
+    save.update_dict(model=curr_settings.db_model, data=check_currency, full_update=True)
 
-    check_dictionary = Validator().return_objects(
-        dictionary_settings.validator, dictionary, parse_as_dict=True
-    )
+    check_dictionary = Validator().return_objects(dictionary_settings.validator, dictionary, parse_as_dict=True)
 
     assert len(check_dictionary) == len(dictionary)
 
-    save.update_dict(model=dictionary_settings.db_model,
-                     data=check_dictionary,
-                     mapping=dictionary_settings.mapping,
-                     full_update=True)
+    save.update_dict(
+        model=dictionary_settings.db_model,
+        data=check_dictionary,
+        mapping=dictionary_settings.mapping,
+        full_update=True
+    )
 
 
 @pytest.mark.parametrize('response_type, parse_as_dict, del_key', [

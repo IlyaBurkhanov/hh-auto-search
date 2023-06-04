@@ -1,12 +1,9 @@
 # from collections import namedtuple
 from sqlalchemy.orm import Session
 
-from db.core import engine
 from db.models import IndustriesRating, IndustryRating, AreasRating
 from employers.employer_auto_rating import get_employ_rating
-
-
-UN_TRUST_COFF = 0.5  # Умножаем фин рейтинг если компания не проверена!
+from configs.config import settings, engine
 
 
 def final_rating(text_rating, area_rating, industry_rating):
@@ -16,9 +13,8 @@ def final_rating(text_rating, area_rating, industry_rating):
 
 class CalcEmployerRating:
     _CalcRating = None
-    # !!!! Хардкод потом убрать !!!!
-    default_area_rating = 5
-    default_industry_rating = 50
+    default_area_rating = settings.DEFAULT_AREA_RATING
+    default_industry_rating = settings.DEFAULT_INDUSTRY_RATING
 
     def __new__(cls):
         if cls._CalcRating is None:
@@ -61,7 +57,7 @@ class CalcEmployerRating:
         area_rating = self.get_area_rating(employer.area)
         industry_rating = self.get_industry_rating(employer.industries)
         rating = final_rating(text_rating, area_rating, industry_rating)
-        rating *= 1 if employer.trusted else UN_TRUST_COFF
+        rating *= 1 if employer.trusted else settings.UN_TRUST_RATING
         result_dict['auto_rating'] = rating
         return result_dict
 

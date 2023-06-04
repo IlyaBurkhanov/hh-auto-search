@@ -7,7 +7,9 @@ from tqdm import tqdm
 from time import sleep
 from random import random
 
-from configs.conf import FULL_EMPLOYERS, RESPONSER, VALIDATOR
+from configs.config import settings
+from configs.dictionaries import FULL_EMPLOYERS
+from configs.workers import RESPONSER, VALIDATOR
 from hh_api.endpoints import Settings
 from db.save_manager import engine
 from db.models import CompanyIndustryRelated
@@ -47,14 +49,13 @@ class UpdateEmployers(AddSession):
     params = {'page': 0}
     # API допускает получение до 5 000 работодателей, но по наблюдениям
     # запрос от 3000-4000 позиции вызывает странные ошибки на стороне сервера
-    max_items = 500  # Не более 5 000
+    max_items = settings.MAX_ITEMS_BY_GET_EMPLOYERS  # Не более 5 000
 
     def __init__(self):
         super().__init__()
         employers_count = self.get_employers_count()
         # В ЛОГИ
-        print('Доля заполнения базы работодателями составляет: '
-              f'{len(FULL_EMPLOYERS) / employers_count:.1%}')
+        print(f'Доля заполнения базы работодателями составляет: {len(FULL_EMPLOYERS) / employers_count:.1%}')
 
     @staticmethod
     def get_employers_count() -> int:
@@ -63,19 +64,15 @@ class UpdateEmployers(AddSession):
         как показатель полноты данных во внутренней БД.
         :return: Число работодателей
         """
-        params = {'page': 0, 'only_with_vacancies': True,
-                  'per_page': 1}
+        params = {'page': 0, 'only_with_vacancies': True, 'per_page': 1}
         # Тут нужно обернуть, перехватывая ошибку response.code != 200
         found_employers = response_employers(params).get('found', None)
         if found_employers is None:
-            raise ValueError('При запросе количества работодателей, '
-                             'что-то пошло не так')
+            raise ValueError('При запросе количества работодателей, что-то пошло не так')
         return int(found_employers)
 
     @staticmethod
-    def _return_request_params(page_per_list, with_vacancies,
-                               text, area, employer_type):
-
+    def _return_request_params(page_per_list, with_vacancies, text, area, employer_type):
         params = dict(page=0, only_with_vacancies=with_vacancies,
                       per_page=page_per_list)
         if employer_type:
@@ -206,8 +203,7 @@ class Employer(AddSession):
         self._save_employer(employer_valid)
 
     def update_empty_employers(self):
-        id_list = [idx for idx, in self.session.query(MODEL.id).filter(
-            MODEL.auto_rating.is_(None))]
+        id_list = [idx for idx, in self.session.query(MODEL.id).filter(MODEL.auto_rating.is_(None))]
         for idx in id_list:
             self.get_employer_by_id(idx, update=True)
 

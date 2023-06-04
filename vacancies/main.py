@@ -1,18 +1,23 @@
+from datetime import datetime, timedelta
+from math import ceil
+from random import random
 from time import sleep
 from typing import List, Optional
 
-from math import ceil
 import requests
-from datetime import datetime, date, timedelta
 
+from configs.config import settings
+from configs.dictionaries import (
+    CONFIG_SEARCH,
+    FULL_EMPLOYERS,
+    SPECIALIZATION_RATING,
+    INDUSTRY_RATING,
+    ROLE_RATING,
+    ALL_VACANCIES
+)
 from employers.main import Employer
 from vacancies.models import (
     ResponseVacancy, FindVacancies, Params, ClusterItem, Clusters
-)
-from configs.conf import (
-    CONFIG_SEARCH, VACANCY_ENDPOINT, API, HEADER, FULL_EMPLOYERS,
-    MAX_VACANCIES_BY_REQUEST, UN_USE_CLUSTER_ID,
-    SPECIALIZATION_RATING, INDUSTRY_RATING, ROLE_RATING, ALL_VACANCIES
 )
 
 ClusterRatings = {
@@ -23,10 +28,9 @@ ClusterRatings = {
 EMPLOYER_WORKER = Employer()
 
 
-def request_vacancies(endpoint,
-                      params: dict = None, headers: dict = None) -> dict:
+def request_vacancies(endpoint, params: dict = None, headers: dict = None) -> dict:
     if headers:
-        headers = dict(**HEADER, **headers)
+        headers = dict(**settings.HEADER, **headers)
     response = requests.get(endpoint, params=params, headers=headers)
     response.raise_for_status()
     return response.json()
@@ -61,22 +65,21 @@ def check_and_save_vacancy(vacancies: List[ResponseVacancy]):
                 vacancy.employer not in FULL_EMPLOYERS):
             EMPLOYER_WORKER.get_employer_by_id(vacancy.employer)
         if vacancy.id not in ALL_VACANCIES and not vacancy.archived:
-            # Cчитаем рейтинг вакансии
-            # Сохраняем вакансию
+            # Считаем рейтинг вакансии.
+            # Сохраняем вакансию.
             ALL_VACANCIES.add(vacancy.id)
             # print(vacancy.id, vacancy.name)
 
 
 class JobSearch:
     """Для каждого запроса создаем отдельный экземпляр данного класса"""
-    ENDPOINT = API + VACANCY_ENDPOINT
+    ENDPOINT = settings.API + settings.VACANCY_ENDPOINT
 
     def __init__(self):
         self.params: Optional[Params] = None
-        self.un_use_clusters = UN_USE_CLUSTER_ID.copy()
+        self.un_use_clusters = settings.UN_USE_CLUSTER_ID.copy()
 
-    def search_best_clusters(
-            self, clusters: List[Clusters]) -> Optional[Clusters]:
+    def search_best_clusters(self, clusters: List[Clusters]) -> Optional[Clusters]:
         """
         Ищем и записываем значение кластера, с минимальным количеством вакансий
         на параметр поиска. Правильно выбранный кластер позволяет сократить
@@ -106,8 +109,7 @@ class JobSearch:
         self.un_use_clusters.append(use_clusters.id)
         return use_clusters
 
-    def search_vacancies_by_date(self, date_from: datetime = None,
-                                 date_to: datetime = None, **params):
+    def search_vacancies_by_date(self, date_from: datetime = None, date_to: datetime = None, **params):
         if not params:
             params = CONFIG_SEARCH
         params['clusters'] = True
@@ -125,14 +127,14 @@ class JobSearch:
     def pars_by_vacancy_strategy(self, response: FindVacancies):
         vacancy_cnt = response.found
         has_cluster = bool(response.clusters)
-        if vacancy_cnt > MAX_VACANCIES_BY_REQUEST and has_cluster:
+        if vacancy_cnt > settings.MAX_VACANCIES_BY_REQUEST and has_cluster:
             use_clusters = self.search_best_clusters(response.clusters)
             if use_clusters is None:
                 self.pars_worker(response)
             else:
                 for cluster in use_clusters.items:
                     params = cluster.params.dict()
-                    if cluster.count > MAX_VACANCIES_BY_REQUEST:
+                    if cluster.count > settings.MAX_VACANCIES_BY_REQUEST:
                         params['clusters'] = True
                     else:
                         params['clusters'] = False
@@ -146,13 +148,13 @@ class JobSearch:
         # print(f'FIND: {response.found} vacancy:')
         # print(self.params.dict())
         use_page = ceil(response.found / response.per_page)
-        max_page = min(use_page, MAX_VACANCIES_BY_REQUEST / response.per_page)
+        max_page = min(use_page, settings.MAX_VACANCIES_BY_REQUEST / response.per_page)
         check_and_save_vacancy(response.items)
         for page in range(1, max_page):
             self.params.page = page
             vacancies = self.return_vacancies()
             check_and_save_vacancy(vacancies.items)
-            sleep(1)
+            sleep(random())
 
     def return_vacancies(self, **params):
         """Передаем параметры запроса, возвращаем валидный результат."""

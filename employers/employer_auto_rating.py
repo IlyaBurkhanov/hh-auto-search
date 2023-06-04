@@ -1,15 +1,13 @@
 import re
-from typing import Union
 
-from configs.conf import MORPH, RATING_CONFIG
+from configs.workers import MORPH
+from configs.dictionaries import RATING_CONFIG
 
 
-def final_rating(rating_profile, rating_work_with, rating_benefits,
-                 rating_areas):
+def final_rating(rating_profile, rating_work_with, rating_benefits, rating_areas):
     if rating_profile + rating_work_with == 0:
         return 0
-    return (1 + .2 * rating_profile) * (
-            rating_work_with * 3 + rating_benefits * 2 + rating_areas + 10)
+    return (1 + .2 * rating_profile) * (rating_work_with * 3 + rating_benefits * 2 + rating_areas + 10)
 
 
 MAX_RATING = final_rating(10, 10, 10, 10)
@@ -32,7 +30,7 @@ def calc_rating(morph_set: set, list_find: list):
             return all(word in morph_set for word in words)
         return result
 
-    def finder(word_rating: Union[list, str]):
+    def finder(word_rating: list | str):
         if isinstance(word_rating, str):
             return finder_str_one(word_rating)
 

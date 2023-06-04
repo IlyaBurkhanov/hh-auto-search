@@ -1,4 +1,4 @@
-from db.core import Base, engine
+from configs.config import Base, engine
 from sqlalchemy.orm import Session
 from hh_api.endpoints import MappingDict
 
@@ -27,8 +27,7 @@ class SaveManager:
                 session.bulk_insert_mappings(model, [dict(x) for x in data])
             else:
                 if model.relate is None:
-                    raise ValueError('Mapping without related is '
-                                     f'impossible [{model.__tablename__}]')
+                    raise ValueError(f'Mapping without related is impossible [{model.__tablename__}]')
                 self.save_with_mapping(session, model, data, mapping)
             session.commit()
 
@@ -57,10 +56,7 @@ class SaveManager:
         fk = model.relate.fk
         for obj_ in data:
             dict_obj = dict(obj_)
-            obj = related_model(
-                **{value: dict_obj.pop(key)
-                   for key, value in mapping.mapping.items()}
-            )
+            obj = related_model(**{value: dict_obj.pop(key) for key, value in mapping.mapping.items()})
             session.add(obj)
             session.flush()
             save_list = []

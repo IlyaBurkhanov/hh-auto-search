@@ -1,22 +1,20 @@
 import csv
-from typing import List, Dict, Mapping, Callable
+from typing import Mapping, Callable
 
 from sqlalchemy.orm import Session
 
-from db.core import engine, Base
+from configs.config import engine, Base
 from db.models import (AreasRating, IndustryRating, IndustriesRating,
                        BusinessRating, RoleRating, SpecializationRating,
                        SpecializationsRating)
 
 
 def read_end_parse(what_parse: str, column_name_pos: Mapping[str, int],
-                   type_dict: Mapping[str, Callable]) -> List[Dict]:
+                   type_dict: Mapping[str, Callable]) -> list[dict]:
     def parse(row):
-        return {key: type_dict.get(key, lambda x: x)(row[val])
-                for key, val in column_name_pos.items()}
+        return {key: type_dict.get(key, lambda x: x)(row[val]) for key, val in column_name_pos.items()}
 
-    with open(f'config_for_rating/{what_parse}_rating.csv', 'r',
-              encoding='utf-8-sig') as file:
+    with open(f'config_for_rating/{what_parse}_rating.csv', 'r', encoding='utf-8-sig') as file:
         csv_reader = csv.reader(file, delimiter=';')
         next(csv_reader)
         return [parse(row) for row in csv_reader]
@@ -27,7 +25,7 @@ def drop_and_creat_table(model: Base.metadata) -> None:
     Base.metadata.create_all(engine, tables=[model.__table__])
 
 
-def save_rating(model: Base.metadata, rating_list: List[Dict]) -> None:
+def save_rating(model: Base.metadata, rating_list: list[dict]) -> None:
     with Session(engine) as session:
         session.bulk_insert_mappings(model, rating_list)
         session.commit()
@@ -125,10 +123,8 @@ def set_specializations_rating_from_csv():
     """
     model = SpecializationsRating
     what = 'specializations'
-    column_name_pos = {'specialization_id': 0, 'id': 1,
-                       'name': 2, 'my_rating': 3}
-    type_dict = {'specialization_id': int,
-                 'my_rating': int}
+    column_name_pos = {'specialization_id': 0, 'id': 1, 'name': 2, 'my_rating': 3}
+    type_dict = {'specialization_id': int, 'my_rating': int}
     save_worker(model, what, column_name_pos, type_dict)
 
 
