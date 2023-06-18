@@ -16,12 +16,11 @@ def read_json(json_path):
 def get_from_db(model, what: str = 'employer'):
     with Session(engine) as session:
         if what == 'employer':
-            result = {idx: rating for idx, rating in session.query(model.id, model.auto_rating)}
+            return {idx: rating for idx, rating in session.query(model.id, model.auto_rating)}
         elif what == 'rating':
-            result = {idx: rating for idx, rating in session.query(model.id, model.my_rating)}
+            return {idx: rating for idx, rating in session.query(model.id, model.my_rating)}
         elif what == 'currency':
-            result = {code: rate for code, rate in session.query(model.code, model.rate)}
-    return result
+            return {code: rate for code, rate in session.query(model.code, model.rate)}
 
 
 FULL_EMPLOYERS = get_from_db(Employers, what='employer')  # Работодатели

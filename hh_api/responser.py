@@ -22,14 +22,12 @@ class Validator:
                 raise e
             return
 
-    def return_objects(self, validator, data, return_list=True,
-                       skip_error=True, parse_as_dict=False):
+    def return_objects(self, validator, data, return_list=True, skip_error=True, parse_as_dict=False):
         if not return_list:
             return self.valid(validator, data, skip_error)
 
         if parse_as_dict:
-            data = [{'key': key, 'value': value}
-                    for key, value in data.items()]
+            data = [{'key': key, 'value': value} for key, value in data.items()]
 
         result = []
         for val in data:
@@ -49,8 +47,7 @@ class Responser:
     def response(self, endpoint, params=None, headers=None):
         if headers:
             headers = dict(**self.header, **headers)
-        self.request = requests.get(API + endpoint, params=params,
-                                    headers=headers)
+        self.request = requests.get(API + endpoint, params=params, headers=headers)
         return self
 
     def get_json(self):

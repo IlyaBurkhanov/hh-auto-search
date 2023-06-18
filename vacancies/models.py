@@ -20,7 +20,7 @@ OBJECT_FIELD = {
     'experience': 'id',  # Требуемый опыт работы
     'employment': 'id',  # Тип занятости
     'billing_type': 'id',  # Тип вакансии для работодателя (платная или нет)
-    'test': 'required',  # Оклик без прохождения теста?
+    'test': 'required',  # Отклик без прохождения теста?
 }
 
 
@@ -69,11 +69,9 @@ class Params(BaseModelWithDict):
 
     @validator('period')
     def check_period(cls, value, values):
-        if value is None or (values['date_from'] is None
-                             and values['date_to'] is None):
+        if value is None or (values['date_from'] is None and values['date_to'] is None):
             return value
-        raise ValueError('period не используется вместе с date_from и '
-                         'date_to')
+        raise ValueError('period не используется вместе с date_from и date_to')
 
 
 class Salary(BaseModel):
@@ -155,8 +153,7 @@ class ResponseVacancy(BaseModel):
             return v
         result = set()
         for text in ['requirement', 'responsibility']:
-            for words in BeautifulSoup(
-                    v.get(text) or '', 'lxml').find_all('highlighttext'):
+            for words in BeautifulSoup(v.get(text) or '', 'lxml').find_all('highlighttext'):
                 for word in words.text.lower().split():
                     result.add(MORPH.normal_forms(word)[0])
         return ' '.join(result)

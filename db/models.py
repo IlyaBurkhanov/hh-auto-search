@@ -75,8 +75,7 @@ class Industry(Base):
 class Industries(Base):
     __tablename__ = 'industries'
     __table_args__ = (PrimaryKeyConstraint('industry_key', 'id'),)
-    relate = RelatedMapping(model=Industry,
-                            fk='industry_key')
+    relate = RelatedMapping(model=Industry, fk='industry_key')
 
     industry_key = Column(Integer, ForeignKey('industry.id'))
     id = Column(String(30))
@@ -101,8 +100,7 @@ class Business(Base):
 class WorkRole(Base):
     __tablename__ = 'work_role'
     __table_args__ = (PrimaryKeyConstraint('business_key', 'id'),)
-    relate = RelatedMapping(model=Business,
-                            fk='business_key')
+    relate = RelatedMapping(model=Business, fk='business_key')
 
     business_key = Column(Integer, ForeignKey('business.id'))
     id = Column(Integer)
@@ -116,8 +114,7 @@ class Specialization(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(500), nullable=False)
-    specializations = relationship('SpecializationsDetails',
-                                   backref='specialization')
+    specializations = relationship('SpecializationsDetails', backref='specialization')
 
 
 class SpecializationsDetails(Base):
@@ -143,10 +140,8 @@ class CompanyIndustryRelated(Base):
     __tablename__ = 'company_industry'
     __table_args__ = (PrimaryKeyConstraint('id_industry', 'id_employer'),)
 
-    id_industry = Column(String(30), ForeignKey('industries.id'),
-                         nullable=True)
-    id_employer = Column(Integer, ForeignKey('employers.id'),
-                         nullable=True)
+    id_industry = Column(String(30), ForeignKey('industries.id'), nullable=True)
+    id_employer = Column(Integer, ForeignKey('employers.id'), nullable=True)
 
 
 class Employers(Base):
@@ -169,8 +164,7 @@ class Employers(Base):
     manual_rating = Column(Integer)
 
     area = relationship('Areas', backref='employers')
-    industries = relationship('Industries', secondary='company_industry',
-                              backref='employers')
+    industries = relationship('Industries', secondary='company_industry', backref='employers')
 
 
 class AreasRating(Base):
@@ -209,8 +203,7 @@ class RoleRating(Base):
     __tablename__ = 'role_rating'
     __table_args__ = (PrimaryKeyConstraint('business_id', 'id'),)
 
-    business_id = Column(Integer, ForeignKey('business_rating.id'),
-                         nullable=True)
+    business_id = Column(Integer, ForeignKey('business_rating.id'), nullable=True)
     id = Column(Integer)
     name = Column(String(500))
     my_rating = Column(Integer, default=2)
@@ -228,8 +221,7 @@ class SpecializationsRating(Base):
     __tablename__ = 'specializations_rating'
     __table_args__ = (PrimaryKeyConstraint('specialization_id', 'id'),)
 
-    specialization_id = Column(Integer, ForeignKey('specialization_rating.id'),
-                               nullable=True)
+    specialization_id = Column(Integer, ForeignKey('specialization_rating.id'), nullable=True)
     id = Column(String(30), nullable=False)
     name = Column(String(500))
     my_rating = Column(Integer, default=50)
@@ -241,8 +233,7 @@ class Skills(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(300), nullable=False)
     rating = Column(Integer, default=None)
-    vacancy = relationship('Vacancy', secondary='vacancy_skills',
-                           back_populates='key_skills')
+    vacancy = relationship('Vacancy', secondary='vacancy_skills', back_populates='key_skills')
 
 
 class VacancySkills(Base):
@@ -303,17 +294,14 @@ class Vacancy(Base):
     counters = Column(Integer)
     description = Column(Text)
     branded_description = Column(Text)
-    key_skills = relationship('Skills', secondary='vacancy_skills',
-                              back_populates='vacancy')
+    key_skills = relationship('Skills', secondary='vacancy_skills', back_populates='vacancy')
     experience = Column(String(50))
     employment = Column(String(50))
     billing_type = Column(String(50))
     allow_messages = Column(Boolean)
     accept_incomplete_resumes = Column(Boolean)
-    professional_roles = relationship('VacancyProfRole',
-                                      uselist=True, backref='vacancy')
-    specializations = relationship('VacancySpecializations', uselist=True,
-                                   backref='vacancy')
+    professional_roles = relationship('VacancyProfRole', uselist=True, backref='vacancy')
+    specializations = relationship('VacancySpecializations', uselist=True, backref='vacancy')
     hidden = Column(Boolean)
     quick_responses_allowed = Column(Boolean)
     test = Column(Boolean)
@@ -327,8 +315,6 @@ class Vacancy(Base):
         if salary:
             self.salary = Salary(**salary)
         if professional_roles:
-            self.professional_roles = [
-                VacancyProfRole(**item) for item in professional_roles]
+            self.professional_roles = [VacancyProfRole(**item) for item in professional_roles]
         if specializations:
-            self.specializations = [
-                VacancySpecializations(**item) for item in specializations]
+            self.specializations = [VacancySpecializations(**item) for item in specializations]

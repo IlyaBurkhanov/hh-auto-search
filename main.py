@@ -10,6 +10,7 @@ from rating.set_rating_config import (
     set_business_role_rating,
     set_specializations_rating
 )
+from employers.main import Employer
 from workers.update_tasks import (
     update_dictionaries,
     update_areas,
@@ -42,6 +43,7 @@ def start_tasks(tasks: list, description=''):
 
 
 if __name__ == '__main__':
+    # Employer().employer_update_inplace(51)  # Test
     start_tasks(set_dictionaries, description='set_dictionaries')
     start_tasks(set_config, description='set_config')
     # Employer().get_employer_by_id(1740, update=True)

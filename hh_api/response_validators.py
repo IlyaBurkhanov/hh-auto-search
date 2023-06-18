@@ -35,11 +35,17 @@ class Industry(BaseModel):
     id: str
     name: str
 
+    class Config:
+        orm_mode = True
+
 
 class ListIndustry(BaseModel):
     id: int
     name: str
     industries: List[Industry]
+
+    class Config:
+        orm_mode = True
 
 
 class Languages(BaseModel):
@@ -65,6 +71,9 @@ class Areas(BaseModel):
     parent_id: int = None
     name: str
     areas: List['Areas'] = None
+
+    class Config:
+        orm_mode = True
 
 
 class Employers(BaseModel):
@@ -96,6 +105,7 @@ class Employer(Employers):
 
     class Config:
         exclude = {'area', 'industries'}
+        orm_mode = True
 
 
 class Specializations(BaseModel):
