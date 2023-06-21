@@ -15,7 +15,7 @@ from configs.config import Base
 
 from sqlalchemy import (
     Column, Integer, String, Text, ForeignKey, PrimaryKeyConstraint, Boolean,
-    Float
+    Float, UniqueConstraint
 )
 
 Base.__table_args__ = {'sqlite_autoincrement': True}
@@ -229,19 +229,23 @@ class SpecializationsRating(Base):
 
 class Skills(Base):
     __tablename__ = 'skills'
+    __table_args__ = (UniqueConstraint('name', sqlite_on_conflict='IGNORE'),)
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(300), nullable=False)
+    name = Column(String(300), nullable=False, primary_key=True,)
     rating = Column(Integer, default=None)
-    vacancy = relationship('Vacancy', secondary='vacancy_skills', back_populates='key_skills')
 
 
 class VacancySkills(Base):
     __tablename__ = 'vacancy_skills'
-    __table_args__ = (PrimaryKeyConstraint('skill_id', 'vacancy_id'),)
+    __table_args__ = (PrimaryKeyConstraint('skill_name', 'vacancy_id'),)
 
-    skill_id = Column(Integer, ForeignKey('skills.id'))
+    skill_name = Column(String(300), ForeignKey('skills.name'))
     vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
+    skill_ref = relationship('Skills', backref='vacancy_skills')
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.skill_ref = Skills(name=kwargs['skill_name'])
 
 
 class Salary(Base):
@@ -294,7 +298,7 @@ class Vacancy(Base):
     counters = Column(Integer)
     description = Column(Text)
     branded_description = Column(Text)
-    key_skills = relationship('Skills', secondary='vacancy_skills', back_populates='vacancy')
+    key_skills = relationship('VacancySkills', backref='vacancy', uselist=True)
     experience = Column(String(50))
     employment = Column(String(50))
     billing_type = Column(String(50))
@@ -310,6 +314,7 @@ class Vacancy(Base):
         salary = kwargs.pop('salary', None)
         professional_roles = kwargs.pop('professional_roles', None)
         specializations = kwargs.pop('specializations', None)
+        key_skills = kwargs.pop('key_skills', None)
         super().__init__(**kwargs)
 
         if salary:
@@ -318,3 +323,5 @@ class Vacancy(Base):
             self.professional_roles = [VacancyProfRole(**item) for item in professional_roles]
         if specializations:
             self.specializations = [VacancySpecializations(**item) for item in specializations]
+        if key_skills:
+            self.key_skills = [VacancySkills(skill_name=key['name']) for key in key_skills]

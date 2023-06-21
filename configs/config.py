@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     HEADER: dict
     RATING_FILE: str
     SEARCH_FILE: str
+    CLUSTERS_STOP_LIST_FILE: str
     UN_USE_CLUSTER_ID: list[str]
     MAX_VACANCIES_BY_REQUEST: int = 500
     VACANCY_ENDPOINT: str

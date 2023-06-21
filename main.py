@@ -11,6 +11,8 @@ from rating.set_rating_config import (
     set_specializations_rating
 )
 from employers.main import Employer
+from vacancies.main import SearchAndSaveVacancies
+from vacancies.models import Params
 from workers.update_tasks import (
     update_dictionaries,
     update_areas,
@@ -43,9 +45,11 @@ def start_tasks(tasks: list, description=''):
 
 
 if __name__ == '__main__':
+    vacancy_test = SearchAndSaveVacancies(Params(text=''))
+    vacancy_test.request_vacancy(vacancy_id=81422266)
     # Employer().employer_update_inplace(51)  # Test
-    start_tasks(set_dictionaries, description='set_dictionaries')
-    start_tasks(set_config, description='set_config')
+    # start_tasks(set_dictionaries, description='set_dictionaries')
+    # start_tasks(set_config, description='set_config')
     # Employer().get_employer_by_id(1740, update=True)
     # UpdateEmployers().update_employers(page_per_list=100, with_vacancies=True,
     #                                    area=1, employer_type='company',

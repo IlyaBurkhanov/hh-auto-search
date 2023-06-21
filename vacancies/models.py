@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel, validator, Field
 
 from configs.config import settings
-from configs.dictionaries import DROP_PARAMS
 from configs.workers import MORPH
 
 # Извлекаемые поля из объектов связанных с моделью
@@ -32,30 +31,29 @@ class OrderVacancy(Enum):
 
 
 class BaseModelWithDict(BaseModel):
-    def dict(self, *args, drop: list = DROP_PARAMS, **kwargs):
+    def dict(self, *args, **kwargs):
         result = super().dict(*args, **kwargs)
         keys = list(result.keys())
-        drop = drop or []
         for key in keys:
-            if result[key] is None or key in drop:
+            if result[key] is None:
                 result.pop(key, None)
         return result
 
 
 class Params(BaseModelWithDict):
-    text: str = ''  # hh.ru/article/1175 - параметры запросов
+    text: str  # hh.ru/article/1175 - параметры запросов
     area: list[int] = None  # id локаций для поиска из справочника
     industry: list[int | str] = None  # id индустрии или ее подвида
     employer_id: list[int] = None  # id работодателей
-    currency: str = 'RUR'  # Код валюты из справочника. Использовать с salary
-    salary: int = 100_000  # ЗП с этой вилкой или без указания ЗП. DEFAULT: RUR
+    currency: str = None  # Код валюты из справочника. Использовать с salary
+    salary: int = None  # ЗП с этой вилкой или без указания ЗП. DEFAULT: RUR
     only_with_salary: bool = False  # Только с указанием ЗП
     date_from: str = None  # (YYYY-MM-DD или YYYY-MM-DDThh:mm:ss±hhmm)
     date_to: str = None  # Публикация С/ПО. Нельзя использовать вместе с period
     period: int = None  # Макс число дней осуществления поиска. DEFAULT: 30
     order_by: OrderVacancy = OrderVacancy.relevance.name  # Сортировка
-    clusters: bool = True  # Выдает кластеры в поисковой выдаче.
-    per_page: int = Field(le=100, ge=1, default=100)  # Число вакансий на лист
+    clusters: bool = False  # Выдает кластеры в поисковой выдаче.
+    per_page: int = Field(le=100, ge=0, default=100)  # Число вакансий на лист
     responses_count_enabled: bool = True  # Количеством откликов на вакансию
     professional_role: int | list[int] = None  # id проф ролей
     page: int = 0  # Страница в пагинации
@@ -192,8 +190,7 @@ class ResponseVacancy(BaseModel):
 
 
 class ClustersParams(BaseModelWithDict):
-    # Модель используется только при нарезке запросов, большом числе найденных
-    # вакансий
+    # Модель используется только при нарезке запросов, большом числе найденных вакансий
     clusters: bool = None
     date_from: str = None
     date_to: str = None
@@ -220,9 +217,9 @@ class ClusterItem(BaseModel):
     def return_params(cls, v, values):
         if not v:
             return None
-        request_params = dict(parse_qsl(urlparse(v).query, separator='&'))
-        if values['count'] <= settings.MAX_VACANCIES_BY_REQUEST:
-            request_params['clusters'] = None
+        request_params = {key: value[0] if len(value) == 1 else value for key, value in parse_qsl(urlparse(v).query)}
+        # if values['count'] <= settings.MAX_VACANCIES_BY_REQUEST:
+        #     request_params['clusters'] = None
         return request_params
 
 
