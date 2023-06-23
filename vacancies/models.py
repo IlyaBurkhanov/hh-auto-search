@@ -75,7 +75,7 @@ class Params(BaseModelWithDict):
 class Salary(BaseModel):
     from_: int | float = Field(default=None, alias='from')
     to: int | float = None
-    gross: bool = True
+    gross: bool | None = True
     currency: str = None
 
 

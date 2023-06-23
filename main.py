@@ -3,6 +3,7 @@ from functools import partial
 from tqdm import tqdm
 
 from configs.config import Base, engine
+from configs.dictionaries import CONFIG_SEARCH
 from rating.set_rating_config import (
     set_areas_rating_from_csv,
     set_industries_rating_from_csv,
@@ -45,8 +46,16 @@ def start_tasks(tasks: list, description=''):
 
 
 if __name__ == '__main__':
-    vacancy_test = SearchAndSaveVacancies(Params(text=''))
-    vacancy_test.request_vacancy(vacancy_id=81422266)
+    new_vacancy = SearchAndSaveVacancies(
+        Params(
+            text=CONFIG_SEARCH['text'],
+            date_from='2023-06-23',
+            date_to='2023-06-23',
+        )
+    )
+    new_vacancy.get_vacancies_by_clusters()
+    # vacancy_test = SearchAndSaveVacancies(Params(text=''))
+    # vacancy_test.request_vacancy(vacancy_id=81422266)
     # Employer().employer_update_inplace(51)  # Test
     # start_tasks(set_dictionaries, description='set_dictionaries')
     # start_tasks(set_config, description='set_config')
