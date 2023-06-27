@@ -324,4 +324,40 @@ class Vacancy(Base):
         if specializations:
             self.specializations = [VacancySpecializations(**item) for item in specializations]
         if key_skills:
-            self.key_skills = [VacancySkills(skill_name=key['name']) for key in key_skills]
+            self.key_skills = list(set([VacancySkills(skill_name=key['name']) for key in key_skills]))
+
+
+class KeyWords(Base):
+    __tablename__ = 'key_words'
+    __table_args__ = (UniqueConstraint('name', sqlite_on_conflict='IGNORE'),)
+
+    name = Column(String(300), nullable=False, primary_key=True,)
+    counts = Column(Integer)
+    block = Column(String(300), nullable=False)
+    rating = Column(Integer)
+
+
+class VacancyRating(Base):
+    __tablename__ = 'vacancy_rating'
+    __table_args__ = (
+        PrimaryKeyConstraint('vacancy_id', 'use_model'),
+        UniqueConstraint('vacancy_id', 'use_model', sqlite_on_conflict='IGNORE'),
+    )
+
+    vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
+    profile_type = Column(String(100), nullable=False)
+    skill_rating = Column(Integer)
+    salary_rating = Column(Integer)
+    area_rating = Column(Integer)
+    employer_rating = Column(Integer)
+    schedule_rating = Column(Integer)
+    experience_rating = Column(Integer)
+    employment_rating = Column(Integer)
+    industry_rating = Column(Integer)
+    description_rating = Column(Integer)
+    brand_description_rating = Column(Integer)
+    use_model = Column(String(100))
+    final_rating = Column(Integer)
+    manual_rating = Column(Integer)
+    date_save = Column(Integer, default=get_time)
+

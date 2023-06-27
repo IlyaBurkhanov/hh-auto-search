@@ -14,6 +14,7 @@ from rating.set_rating_config import (
 from employers.main import Employer
 from vacancies.main import SearchAndSaveVacancies
 from vacancies.models import Params
+from vacancy_rating.vacancy_rating import VacancyRatingCalc
 from workers.update_tasks import (
     update_dictionaries,
     update_areas,
@@ -46,14 +47,16 @@ def start_tasks(tasks: list, description=''):
 
 
 if __name__ == '__main__':
-    new_vacancy = SearchAndSaveVacancies(
-        Params(
-            text=CONFIG_SEARCH['text'],
-            date_from='2023-06-23',
-            date_to='2023-06-23',
-        )
-    )
-    new_vacancy.get_vacancies_by_clusters()
+    v = VacancyRatingCalc()
+    v.calculate_rating(1) #40379537
+    # new_vacancy = SearchAndSaveVacancies(
+    #     Params(
+    #         text=CONFIG_SEARCH['text'],
+    #         date_from='2023-06-26',
+    #         date_to='2023-06-26',
+    #     )
+    # )
+    # new_vacancy.get_vacancies_by_clusters()
     # vacancy_test = SearchAndSaveVacancies(Params(text=''))
     # vacancy_test.request_vacancy(vacancy_id=81422266)
     # Employer().employer_update_inplace(51)  # Test
