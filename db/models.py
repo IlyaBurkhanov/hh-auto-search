@@ -346,6 +346,7 @@ class VacancyRating(Base):
 
     vacancy_id = Column(Integer, ForeignKey('vacancy.id'))
     profile_type = Column(String(100), nullable=False)
+    role_rating = Column(Integer)
     skill_rating = Column(Integer)
     salary_rating = Column(Integer)
     area_rating = Column(Integer)
