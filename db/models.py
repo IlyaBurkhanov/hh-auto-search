@@ -4,7 +4,8 @@ __all__ = [
     'CompanyIndustryRelated', 'IndustryRating', 'IndustriesRating',
     'BusinessRating', 'RoleRating', 'Specialization', 'SpecializationsDetails',
     'SpecializationRating', 'SpecializationsRating', 'Skills', 'VacancySkills',
-    'Salary', 'VacancyProfRole', 'VacancySpecializations', 'Vacancy'
+    'Salary', 'VacancyProfRole', 'VacancySpecializations', 'Vacancy', 'KeyWords',
+    'VacancyRating',
 ]
 
 from datetime import datetime
