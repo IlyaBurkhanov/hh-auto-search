@@ -362,4 +362,3 @@ class VacancyRating(Base):
     final_rating = Column(Integer)
     manual_rating = Column(Integer)
     date_save = Column(Integer, default=get_time)
-

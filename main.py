@@ -48,7 +48,8 @@ def start_tasks(tasks: list, description=''):
 
 if __name__ == '__main__':
     v = VacancyRatingCalc()
-    v.calculate_rating(1) #40379537
+    v.calculate_vacancies_rating()
+    # v.calculate_rating(43342136)
     # new_vacancy = SearchAndSaveVacancies(
     #     Params(
     #         text=CONFIG_SEARCH['text'],
