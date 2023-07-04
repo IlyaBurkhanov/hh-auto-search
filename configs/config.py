@@ -1,11 +1,12 @@
 from typing import Callable
 from typing_extensions import TypedDict, NotRequired
 from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseSettings
+from pydantic import BaseSettings, SecretStr
 from sqlalchemy import create_engine
 
 
 class Settings(BaseSettings):
+    # API and dictionary ENVS
     API: str
     HEADER: dict
     RATING_FILE: str
@@ -14,8 +15,6 @@ class Settings(BaseSettings):
     UN_USE_CLUSTER_ID: list[str]
     MAX_VACANCIES_BY_REQUEST: int = 500
     VACANCY_ENDPOINT: str
-    DSN: str
-    ECHO: bool = True
     UN_TRUST_RATING: float = .5
     DEFAULT_AREA_RATING: int = 5
     DEFAULT_INDUSTRY_RATING: int = 50
@@ -25,8 +24,26 @@ class Settings(BaseSettings):
     COEFFICIENT_BENEFIT_RATING: float
     COEFFICIENT_AREA_RATING: float
 
+    # DB
+    DSN: str
+    ECHO: bool = True
+
+    # RATING ENV
     PATH_TO_EMPLOYER_RATING_MODULE: str = 'employers.employer_auto_rating'
     EMPLOYER_RATING_FUNCTION: str = 'get_employer_rating'
+
+    # ACCESS ENV
+    CLIENT_ID: SecretStr
+    CLIENT_SECRET: SecretStr
+    GRANT_TYPE_AUTH: str = 'authorization_code'
+    GRANT_TYPE_REFRESH: str = 'refresh_token'
+    TOKEN_TYPE: str = 'Bearer'
+    URL_MANUAL_AUTH: str = 'https://hh.ru/oauth/authorize'
+    URL_GET_TOKEN: str = 'https://hh.ru/oauth/token'
+    HEADER_GET_TOKEN: dict = {'Content-Type': 'application/x-www-form-urlencoded'}
+    REDIRECT_URI: str = 'localhost'
+    ACCESS_DATA_FILE: str
+    URL_ALL_RESUMES: str = 'https://api.hh.ru/resumes/mine'
 
     class Config:
         env_file = '.env'
