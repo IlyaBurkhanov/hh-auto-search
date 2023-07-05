@@ -5,7 +5,7 @@ __all__ = [
     'BusinessRating', 'RoleRating', 'Specialization', 'SpecializationsDetails',
     'SpecializationRating', 'SpecializationsRating', 'Skills', 'VacancySkills',
     'Salary', 'VacancyProfRole', 'VacancySpecializations', 'Vacancy', 'KeyWords',
-    'VacancyRating',
+    'VacancyRating', 'VacancyRoles', 'ResponseCV',
 ]
 
 from datetime import datetime
@@ -23,8 +23,16 @@ Base.__table_args__ = {'sqlite_autoincrement': True}
 Base.relate = None
 
 
-def get_time():
+def get_date():
     return datetime.now().strftime('%Y%m%d')
+
+
+def get_time():
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+def get_time_integer():
+    return int(datetime.now().strftime('%Y%m%d%H%M%S'))
 
 
 @dataclass
@@ -280,7 +288,7 @@ class Vacancy(Base):
     __tablename__ = 'vacancy'
 
     id = Column(Integer, primary_key=True)
-    date_save = Column(Integer, default=get_time)
+    date_save = Column(Integer, default=get_time_integer)
     name = Column(String(500))
     premium = Column(Boolean)
     department = Column(String(500))
@@ -361,4 +369,33 @@ class VacancyRating(Base):
     use_model = Column(String(100))
     final_rating = Column(Integer)
     manual_rating = Column(Integer)
-    date_save = Column(Integer, default=get_time)
+    date_save = Column(Integer, default=get_date)
+
+
+class VacancyRoles(Base):
+    __tablename__ = 'vacancy_roles'
+    __table_args__ = (UniqueConstraint('role_name', sqlite_on_conflict='IGNORE'),)
+
+    role_name = Column(String, primary_key=True, nullable=False)
+    role_description = Column(String, nullable=True)
+    cv_id_rus = Column(String)
+    cv_id_us = Column(String)
+
+
+class ResponseCV(Base):
+    __tablename__ = 'response_cv'
+    __table_args__ = {'sqlite_autoincrement': True}
+
+    id = Column(Integer, primary_key=True)
+    vacancy_id = Column(Integer, ForeignKey('vacancy.id'), nullable=False)
+    employer_id = Column(Integer, ForeignKey('employers.id'), nullable=True)
+    role_name = Column(String, ForeignKey('vacancy_roles.role_name'), nullable=True)
+    vacancy_rating = Column(Integer)
+    has_test = Column(Boolean)
+    is_success = Column(Boolean)
+    error_name = Column(String)
+    is_invite = Column(Boolean)
+    employer_message = Column(String)
+    self_description = Column(String)
+    interview_rating = Column(Integer)
+    response_time = Column(String, default=get_time)

@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 from configs.config import Base, engine
 from configs.dictionaries import CONFIG_SEARCH
+from cv_responses.response import CVResponser
 from rating.set_rating_config import (
     set_areas_rating_from_csv,
     set_industries_rating_from_csv,
@@ -47,8 +48,12 @@ def start_tasks(tasks: list, description=''):
 
 
 if __name__ == '__main__':
-    v = VacancyRatingCalc()
-    v.calculate_vacancies_rating()
+    # pass
+    CV = CVResponser()
+    # CV.get_best_vacancies_id(limit=10, from_date=20230626, from_vacancy_id=82463500, only_vacancy_role='dev',
+    #                          except_vacancy_ids=[82466390, 82467015, 82467257])
+    # v = VacancyRatingCalc()
+    # v.calculate_vacancies_rating()
     # v.calculate_rating(43342136)
     # new_vacancy = SearchAndSaveVacancies(
     #     Params(
