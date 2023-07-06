@@ -1,0 +1,46 @@
+API=https://api.hh.ru/  # API HH
+RATING_FILE=file_examples/employer_rating_config.json  # Конфиги для оценки работодателя
+SEARCH_FILE=file_examples/search_config.json # Конфиги для поиска вакансии
+CLUSTERS_STOP_LIST_FILE=file_examples/cluster_stop_list.json  # Конфиги для исключения кластеров
+MAX_VACANCIES_BY_REQUEST=1000  # Макс число вакансий обрабатываемых на один кластер!
+VACANCY_ENDPOINT=vacancies  # эндпоинт вакансии
+HEADER='{"User-Agent": "Ilya_APP/0.0.1 (iaburhanov@mail.ru)"}'  # Передается в хедере, требование HH.ru
+DSN=sqlite:///hh.db # dsn до БД
+ECHO=False  # logs of transaction
+
+# DEFAULTS
+# Рейтинги смотрим по коду!
+UN_TRUST_RATING
+DEFAULT_AREA_RATING
+DEFAULT_INDUSTRY_RATING
+MAX_ITEMS_BY_GET_EMPLOYERS
+COEFFICIENT_PROFILE_RATING
+COEFFICIENT_FIELD_RATING
+COEFFICIENT_BENEFIT_RATING
+COEFFICIENT_AREA_RATING
+
+# PATH TO MODELS
+# Модуль и функция расчета рейтинга (открыт в github)
+PATH_TO_EMPLOYER_RATING_MODULE=employers.employer_auto_rating
+EMPLOYER_RATING_FUNCTION=get_employer_rating
+
+# API ACCESS
+CLIENT_ID  # Получить у HH
+CLIENT_SECRET  # Получить у HH
+GRANT_TYPE_AUTH=authorization_code
+GRANT_TYPE_REFRESH=refresh_token
+TOKEN_TYPE=Bearer
+URL_MANUAL_AUTH=https://hh.ru/oauth/authorize
+URL_GET_TOKEN=https://hh.ru/oauth/token
+HEADER_GET_TOKEN='{"Content-Type": "application/x-www-form-urlencoded"}'
+REDIRECT_URI # Указать при запросе доступа у HH
+ACCESS_DATA_FILE  # файл хранения токенов
+URL_ALL_RESUMES=https://api.hh.ru/resumes/mine
+
+# TXT
+MESSAGE_RU_FILE=file_examples/resp_ru.txt  # RU и ENG отзыв!
+MESSAGE_US_FILE=file_examples/resp_us.txt
+
+# RESPONSE
+HEADER_VACANCY_REQUEST='{"Content-Type": "multipart/form-data"}'
+URL_FOR_REQUEST_CV=https://hh.ru/negotiations

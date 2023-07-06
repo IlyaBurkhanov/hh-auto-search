@@ -1,0 +1,8 @@
+{
+	"use_cluster": ["professional_area", "industry", "professional_role"],
+	"cluster_stops": {
+		"area": [113],
+		"experience": ["noExperience"],
+		"employment": ["probation"]
+	}
+}
