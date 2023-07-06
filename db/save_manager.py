@@ -1,5 +1,6 @@
-from configs.config import Base, engine
 from sqlalchemy.orm import Session
+
+from configs.config import Base, engine
 from hh_api.endpoints import MappingDict
 
 

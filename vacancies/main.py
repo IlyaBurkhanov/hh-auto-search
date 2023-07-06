@@ -2,11 +2,10 @@ import time
 from collections import namedtuple
 from copy import deepcopy
 from random import random
-from sqlalchemy.orm import Session
 
 import requests
+from sqlalchemy.orm import Session
 
-from db.models import Vacancy, Employers
 from configs.config import settings, engine
 from configs.dictionaries import (
     AREAS_RATING,
@@ -17,6 +16,7 @@ from configs.dictionaries import (
     ROLE_RATING,
     CURRENCY
 )
+from db.models import Vacancy, Employers
 from employers.main import Employer
 from vacancies.models import ResponseVacancy, FindVacancies, Params, Clusters, Salary
 
@@ -68,7 +68,7 @@ class VacancyWorker:
             ):
                 continue
             self._check_employer(vacancy)
-            self.request_vacancy(vacancy_id=vacancy.id)
+            self.get_and_save_vacancy(vacancy_id=vacancy.id)
             time.sleep(random())
 
     @staticmethod
@@ -112,9 +112,14 @@ class VacancyWorker:
             if not bool(session.query(Employers).filter_by(id=vacancy.employer).first()):
                 EMPLOYER_WORKER.get_employer_by_id(id_company=vacancy.employer)
 
-    def request_vacancy(self, vacancy_id: int):
+    @staticmethod
+    def request_vacancy(vacancy_id: int) -> ResponseVacancy:
         response = request_vacancies(endpoint=f'{ENDPOINT_VACANCY}/{vacancy_id}')
         vacancy = ResponseVacancy.parse_obj(response)
+        return vacancy
+
+    def get_and_save_vacancy(self, vacancy_id: int) -> None:
+        vacancy = self.request_vacancy(vacancy_id)
         self.save_vacancy(vacancy)
 
 
@@ -135,7 +140,7 @@ class SearchAndSaveVacancies:
         cluster_params.per_page = 0  # API DOCS
         cluster_params.clusters = True
         response = request_vacancies(endpoint=ENDPOINT_VACANCY, params=cluster_params.dict(exclude_none=True))
-        return [Clusters.parse_obj(cluster) for cluster in response["clusters"]]
+        return [Clusters.parse_obj(cluster) for cluster in response['clusters']]
 
     def _check_clusters_in_stop_list(self) -> None:
         use_clusters = []

@@ -1,10 +1,18 @@
 import json
+
 from sqlalchemy.orm import Session
 
 from configs.config import engine, settings
 from db.models import (
-    Employers, BusinessRating, IndustriesRating, IndustryRating, RoleRating,
-    SpecializationRating, SpecializationsRating, AreasRating, Currency
+    AreasRating,
+    BusinessRating,
+    Currency,
+    Employers,
+    IndustriesRating,
+    IndustryRating,
+    RoleRating,
+    SpecializationRating,
+    SpecializationsRating,
 )
 
 

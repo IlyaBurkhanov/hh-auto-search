@@ -1,8 +1,8 @@
 import re
 
 from configs.config import RATING_RESULT_PROTOCOL, settings
-from configs.workers import MORPH
 from configs.dictionaries import RATING_CONFIG
+from configs.workers import MORPH
 
 
 def final_rating(rating_profile: int, rating_work_with: int, rating_benefits: int, rating_areas: int) -> float:

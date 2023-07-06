@@ -1,8 +1,9 @@
 import json
+
 import requests
 import unicodedata
-
 from pydantic import ValidationError
+
 from configs.config import settings
 
 API = settings.API

@@ -1,7 +1,7 @@
 import pymorphy3
+
 from db.save_manager import SaveManager
 from hh_api.responser import Responser, Validator
-
 
 VALIDATOR = Validator()  # Валидатор
 RESPONSER = Responser()  # Запросы к HH

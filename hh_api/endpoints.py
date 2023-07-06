@@ -1,5 +1,6 @@
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+
 from pydantic import BaseModel as PydanticModel
 
 import db.models as models
@@ -92,4 +93,3 @@ class Settings:
         validator=validator.Specialization,
         mapping=MappingDict(mapping=get_mapping_dict('id', 'name'), value_key='specializations'),
     )
-

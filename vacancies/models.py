@@ -5,7 +5,6 @@ from urllib.parse import parse_qsl, urlparse
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, validator, Field
 
-from configs.config import settings
 from configs.workers import MORPH
 
 # Извлекаемые поля из объектов связанных с моделью
@@ -111,7 +110,7 @@ class ResponseVacancy(BaseModel):
     area: int = None  # id местоположения
     salary: Salary = None  # ЗП вилка
     # на close и direct нет смысла откликаться
-    type_: str = Field(default='close', alias='type')
+    type_: str = Field(default='closed', alias='type')
     response_url: str = None  # Внешний сайт, если нельзя откликаться
     published_at: str = None  # Дата публикации
     created_at: str = None  # Дата создания вакансии

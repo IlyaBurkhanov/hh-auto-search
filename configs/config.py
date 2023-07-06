@@ -1,8 +1,9 @@
 from typing import Callable
-from typing_extensions import TypedDict, NotRequired
-from sqlalchemy.ext.declarative import declarative_base
+
 from pydantic import BaseSettings, SecretStr
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from typing_extensions import TypedDict, NotRequired
 
 
 class Settings(BaseSettings):
@@ -44,6 +45,13 @@ class Settings(BaseSettings):
     REDIRECT_URI: str = 'localhost'
     ACCESS_DATA_FILE: str
     URL_ALL_RESUMES: str = 'https://api.hh.ru/resumes/mine'
+
+    # MESSAGES
+    MESSAGE_RU_FILE: str
+    MESSAGE_US_FILE: str
+
+    HEADER_VACANCY_REQUEST: dict = {'Content-Type': 'multipart/form-data'}
+    URL_FOR_REQUEST_CV: str = 'https://hh.ru/negotiations'
 
     class Config:
         env_file = '.env'

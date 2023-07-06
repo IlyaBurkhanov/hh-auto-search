@@ -8,16 +8,23 @@ __all__ = [
     'VacancyRating', 'VacancyRoles', 'ResponseCV',
 ]
 
+from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy.orm import relationship
-from dataclasses import dataclass
-from configs.config import Base
-
 from sqlalchemy import (
-    Column, Integer, String, Text, ForeignKey, PrimaryKeyConstraint, Boolean,
-    Float, UniqueConstraint
+    Boolean,
+    Column,
+    Float,
+    ForeignKey,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    Text,
+    UniqueConstraint,
 )
+from sqlalchemy.orm import relationship
+
+from configs.config import Base
 
 Base.__table_args__ = {'sqlite_autoincrement': True}
 Base.relate = None
@@ -53,8 +60,7 @@ class Dictionaries(Base):
     __tablename__ = 'dictionaries'
     __table_args__ = (PrimaryKeyConstraint('attr_key', 'id'),)
 
-    relate = RelatedMapping(model=DictionariesKey,
-                            fk='attr_key')
+    relate = RelatedMapping(model=DictionariesKey, fk='attr_key')
 
     attr_key = Column(Integer, ForeignKey('dictionaries_keys.id'))
     id = Column(String(300), nullable=False)
@@ -240,7 +246,7 @@ class Skills(Base):
     __tablename__ = 'skills'
     __table_args__ = (UniqueConstraint('name', sqlite_on_conflict='IGNORE'),)
 
-    name = Column(String(300), nullable=False, primary_key=True,)
+    name = Column(String(300), nullable=False, primary_key=True, )
     rating = Column(Integer, default=None)
 
 
@@ -340,7 +346,7 @@ class KeyWords(Base):
     __tablename__ = 'key_words'
     __table_args__ = (UniqueConstraint('name', sqlite_on_conflict='IGNORE'),)
 
-    name = Column(String(300), nullable=False, primary_key=True,)
+    name = Column(String(300), nullable=False, primary_key=True, )
     counts = Column(Integer)
     block = Column(String(300), nullable=False)
     rating = Column(Integer)

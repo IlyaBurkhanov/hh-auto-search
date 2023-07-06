@@ -1,12 +1,18 @@
 import csv
-from typing import Mapping, Callable
+from typing import Callable, Mapping
 
 from sqlalchemy.orm import Session
 
 from configs.config import engine, Base
-from db.models import (AreasRating, IndustryRating, IndustriesRating,
-                       BusinessRating, RoleRating, SpecializationRating,
-                       SpecializationsRating)
+from db.models import (
+    AreasRating,
+    BusinessRating,
+    IndustriesRating,
+    IndustryRating,
+    RoleRating,
+    SpecializationRating,
+    SpecializationsRating
+)
 
 
 def read_end_parse(what_parse: str, column_name_pos: Mapping[str, int],

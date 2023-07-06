@@ -1,21 +1,21 @@
-import unicodedata
-
-from bs4 import BeautifulSoup
 from importlib import import_module
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import ProgrammingError
-from tqdm import tqdm
-from time import sleep
 from random import random
+from time import sleep
+
+import unicodedata
+from bs4 import BeautifulSoup
+from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.orm import Session
+from tqdm import tqdm
 
 from configs.config import settings, EMPLOYER_RATING_PROTOCOL
 from configs.dictionaries import FULL_EMPLOYERS
 from configs.workers import RESPONSER, VALIDATOR
+from db.models import CompanyIndustryRelated
+from db.save_manager import engine
+from employers.rating import CalcEmployerRating
 from hh_api.endpoints import Settings
 from hh_api.response_validators import Employer
-from db.save_manager import engine
-from db.models import CompanyIndustryRelated
-from employers.rating import CalcEmployerRating
 
 
 class AddSession:
@@ -33,7 +33,6 @@ rating_function: EMPLOYER_RATING_PROTOCOL = getattr(
     import_module(settings.PATH_TO_EMPLOYER_RATING_MODULE),
     settings.EMPLOYER_RATING_FUNCTION
 )
-
 
 EmployerRating = CalcEmployerRating(rating_function)
 ENDPOINT = Settings.EMPLOYERS.endpoint
