@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     COEFFICIENT_FIELD_RATING: float
     COEFFICIENT_BENEFIT_RATING: float
     COEFFICIENT_AREA_RATING: float
+    RATING_PATH: str
 
     # DB
     DSN: str

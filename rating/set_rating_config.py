@@ -3,7 +3,7 @@ from typing import Callable, Mapping
 
 from sqlalchemy.orm import Session
 
-from configs.config import engine, Base
+from configs.config import engine, Base, settings
 from db.models import (
     AreasRating,
     BusinessRating,
@@ -20,7 +20,7 @@ def read_end_parse(what_parse: str, column_name_pos: Mapping[str, int],
     def parse(row):
         return {key: type_dict.get(key, lambda x: x)(row[val]) for key, val in column_name_pos.items()}
 
-    with open(f'config_for_rating/{what_parse}_rating.csv', 'r', encoding='utf-8-sig') as file:
+    with open(f'{settings.RATING_PATH}/{what_parse}_rating.csv', 'r', encoding='utf-8-sig') as file:
         csv_reader = csv.reader(file, delimiter=';')
         next(csv_reader)
         return [parse(row) for row in csv_reader]

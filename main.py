@@ -17,7 +17,7 @@ from rating.set_rating_config import (
 from employers.main import Employer
 from vacancies.main import SearchAndSaveVacancies
 from vacancies.models import Params
-from vacancy_rating.vacancy_rating import VacancyRatingCalc  # USE YOUR CLASS IT's HIDDEN ON GITHUB!!!
+from vacancy_rating.vacancy_rating import VacancyRatingCalc  # USE YOUR CLASS! IT's HIDDEN ON GITHUB!!!
 from workers.update_tasks import (
     update_dictionaries,
     update_areas,
@@ -50,8 +50,8 @@ def start_tasks(tasks: list, description=''):
 
 
 def get_new_vacancy():
-    with Session(bind=engine) as s:
-        last_date = s.query(Vacancy).order_by(Vacancy.published_at.desc()).one().published_at
+    with Session(bind=engine) as session:
+        last_date = session.query(Vacancy).order_by(Vacancy.published_at.desc()).one().published_at
     now_date = datetime.now().strftime('%Y-%m-%d')
     SearchAndSaveVacancies(
         Params(text=CONFIG_SEARCH['text'], date_from=last_date, date_to=now_date)
