@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from functools import partial
 from sqlalchemy.orm import Session
@@ -59,7 +60,16 @@ def get_new_vacancy():
     VacancyRatingCalc().calculate_vacancies_rating()
 
 
+def response_best_vacancies():
+    cv = CVResponser()
+    for role, limit in [('other', 1), ('business', 2), ('dev', 3), ('analyst', 3), ('research', 1), ('ds',  1)]:
+        for ids in cv.get_best_vacancies_id(limit=limit, only_vacancy_role=role):
+            cv.vacancy_response(ids)
+            time.sleep(10)
+
+
 if __name__ == '__main__':
+    response_best_vacancies()
     # start_tasks(set_dictionaries, description='set_dictionaries')
     # start_tasks(set_config, description='set_config')
 
@@ -70,12 +80,12 @@ if __name__ == '__main__':
     # v = VacancyRatingCalc()
     # v.calculate_vacancies_rating()
     # v.calculate_rating(43342136)
-    new_vacancy = SearchAndSaveVacancies(
-        Params(
-            text=CONFIG_SEARCH['text'],
-            date_from='2023-07-05',
-            date_to='2023-07-05',
-        )
-    )
-    new_vacancy.get_vacancies_by_clusters()
+    # new_vacancy = SearchAndSaveVacancies(
+    #     Params(
+    #         text=CONFIG_SEARCH['text'],
+    #         date_from='2023-07-06',
+    #         date_to='2023-07-06',
+    #     )
+    # )
+    # new_vacancy.get_vacancies_by_clusters()
 

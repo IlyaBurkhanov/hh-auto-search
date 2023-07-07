@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     MESSAGE_US_FILE: str
 
     HEADER_VACANCY_REQUEST: dict = {'Content-Type': 'multipart/form-data'}
-    URL_FOR_REQUEST_CV: str = 'https://hh.ru/negotiations'
+    URL_FOR_REQUEST_CV: str = 'https://api.hh.ru/negotiations'
 
     class Config:
         env_file = '.env'

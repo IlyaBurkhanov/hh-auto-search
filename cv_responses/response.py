@@ -84,7 +84,7 @@ class CVResponser:
 
     def vacancy_response(self, vacancy_id: int) -> None:
         vacancy: ResponseVacancy = VacancyWorker.request_vacancy(vacancy_id)
-        if vacancy.type_ == 'closed':
+        if vacancy.archived or vacancy.type_ in {'closed', 'archived'}:
             return self.update_vacancy_to_close(vacancy_id)
 
         if (vacancy_db := self.session.get(Vacancy, vacancy_id)) is None:
@@ -96,7 +96,7 @@ class CVResponser:
         use_role = self.roles.get(vacancy_rating.profile_type, 'default')
         message = (self.message_ru if language == 'ru' else self.message_us).format(company_name=employer.name or '')
         cv_id = use_role.cv_id_rus if language == 'ru' else use_role.cv_id_us
-        result = None  # self._send_response_to_vacancy(message, cv_id, vacancy_id)
+        result = self._send_response_to_vacancy(message, cv_id, vacancy_id)
         response_cv = ResponseCV(
             vacancy_id=vacancy_id,
             employer_id=vacancy_db.employer,
@@ -111,8 +111,8 @@ class CVResponser:
         self.session.flush()
 
     def _send_response_to_vacancy(self, message: str, cv_id: str, vacancy_id: int) -> None | str:
-        data = {'vacancy_id': vacancy_id, 'resume_id': cv_id, 'message': message}
-        result = Client().post(settings.URL_FOR_REQUEST, headers=self._response_header, data=data)
+        params = {'vacancy_id': vacancy_id, 'resume_id': cv_id, 'message': message}
+        result = Client().post(settings.URL_FOR_REQUEST_CV, headers=self._response_header, params=params)
         if result.status_code in self.request_cv_errors:
             return self.request_cv_errors[result.status_code]
 
