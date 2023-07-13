@@ -123,7 +123,7 @@ class CVResponser:
             self._refresh_token()
             self._use_refresh_token += 1
             self._send_response_to_vacancy(message, cv_id, vacancy_id)
-        return response['error_description']
+        return response.get('error_description') or response['description']
 
     def update_vacancy_to_close(self, vacancy_id: int) -> None:
         vacancy = self.session.get(Vacancy, vacancy_id)

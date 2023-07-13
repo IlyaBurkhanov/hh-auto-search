@@ -83,8 +83,8 @@ if __name__ == '__main__':
     # new_vacancy = SearchAndSaveVacancies(
     #     Params(
     #         text=CONFIG_SEARCH['text'],
-    #         date_from='2023-07-06',
-    #         date_to='2023-07-06',
+    #         date_from='2023-07-12',
+    #         date_to='2023-07-12',
     #     )
     # )
     # new_vacancy.get_vacancies_by_clusters()
