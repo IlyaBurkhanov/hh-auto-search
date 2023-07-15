@@ -16,7 +16,7 @@ from configs.dictionaries import (
     ROLE_RATING,
     CURRENCY
 )
-from db.models import Vacancy, Employers
+from db.models import Vacancy, Employers, VacancyRating
 from employers.main import Employer
 from vacancies.models import ResponseVacancy, FindVacancies, Params, Clusters, Salary
 

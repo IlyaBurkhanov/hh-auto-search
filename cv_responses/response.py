@@ -141,6 +141,7 @@ class CVResponser:
             except_vacancy_ids: list[int] = None,
             except_employer_ids: list[int] = None,
             without_test: bool = False,
+            only_new_employer: bool = False,
     ) -> list[int]:
         """
         :param without_test: only without test
@@ -150,6 +151,7 @@ class CVResponser:
         :param only_vacancy_role: Use role by vacancy
         :param except_vacancy_ids: list of exception vacancy
         :param except_employer_ids: list of exception employer
+        :param only_new_employer: only cv employers without response
         :return: vacancy id without responses.
         """
         if isinstance(from_date, datetime):
@@ -176,6 +178,13 @@ class CVResponser:
                 VacancyRating.profile_type == only_vacancy_role if only_vacancy_role else True,
                 VacancyRating.vacancy_id.notin_(select(ResponseCV.vacancy_id)),
                 or_(Employers.manual_rating.is_(None), Employers.manual_rating > 0),
+                Vacancy.employer.notin_(
+                    select(
+                        ResponseCV.employer_id
+                    ).where(
+                        ResponseCV.role_name == only_vacancy_role if only_vacancy_role else True
+                    ),
+                ) if only_new_employer else True,
             )
         ).order_by(
             case(
